@@ -15,7 +15,7 @@ export const AnimatedTooltip = ({
     <>
       {items.map((item) => (
         <div className="group relative -mr-4" key={item.name}>
-          <Link href="https://buycoffee.top" target="_blank">
+          <Link href="https://github.com/clowlove/nezha-dash-pro" target="_blank">
             <Image
               width={40}
               height={40}

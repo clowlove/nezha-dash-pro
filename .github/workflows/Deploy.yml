@@ -8,8 +8,8 @@ on:
       - "v*"
 
 env:
-  REGISTRY_IMAGE: hamster1963/nezha-dash
-  ALIYUN_REGISTRY_IMAGE: registry.cn-guangzhou.aliyuncs.com/hamster-home/nezha-dash
+  REGISTRY_IMAGE: clowlove/nezha-dash-pro
+  ALIYUN_REGISTRY_IMAGE: registry.cn-guangzhou.aliyuncs.com/clowlove/nezha-dash-pro
 
 jobs:
   build-and-push:
@@ -63,7 +63,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 22
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4

@@ -1,19 +1,40 @@
 ---
-name: Bug 提交
-about: 提交 bug，让面板变得更好。
-title: "[BUG]"
-labels: ""
-assignees: ""
+name: Bug Report
+about: Report a bug to help us improve
+title: "[Bug] "
+labels: bug
 ---
 
-**面板版本（二选一）**
-V0 | V1
+## Bug Description
 
-**描述 bug**
-在这里描述 bug 的相关信息
+A clear and concise description of the bug.
 
-**屏幕截图**
-有屏幕截图可以帮助更快定位到问题
+## Steps to Reproduce
 
-**额外信息**
-可附上其他需要的额外信息
+1. Go to '...'
+2. Click on '...'
+3. See error
+
+## Expected Behavior
+
+What you expected to happen.
+
+## Actual Behavior
+
+What actually happened.
+
+## Environment
+
+- OS: [e.g. Ubuntu 22.04]
+- Browser: [e.g. Chrome 120]
+- Node.js: [e.g. 22.x]
+- NezhaDash Pro version: [e.g. 1.0.0]
+- Deployment: [e.g. Docker / Vercel / Manual]
+
+## Screenshots
+
+If applicable, add screenshots to help explain the problem.
+
+## Additional Context
+
+Add any other context about the problem here.

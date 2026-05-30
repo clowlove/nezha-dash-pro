@@ -4,8 +4,7 @@ import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import pack from "@/package.json"
 
-const GITHUB_URL = "https://github.com/hamster1963/nezha-dash"
-const PERSONAL_URL = "https://buycoffee.top"
+const GITHUB_URL = "https://github.com/clowlove/nezha-dash-pro"
 
 type LinkProps = {
   href: string
@@ -46,7 +45,7 @@ export default function Footer() {
         </p>
         <section className={`mt-1 flex items-center gap-2 ${baseTextStyles}`}>
           {t("section_607-869_2020")}
-          {currentYear} <FooterLink href={PERSONAL_URL}>{t("a_800-850_Hamster1963")}</FooterLink>
+          {currentYear} <FooterLink href={GITHUB_URL}>NezhaDash Pro</FooterLink>
         </section>
       </section>
       <p className={`mt-1 ${baseTextStyles}`}>
