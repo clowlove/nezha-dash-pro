@@ -1,75 +1,24 @@
-import { ThemeColorManager } from "@/components/ThemeColorManager"
-import getEnv from "@/lib/env-entry"
-import { cn } from "@/lib/utils"
-import "@/styles/globals.css"
-import "flag-icons/css/flag-icons.min.css"
-import "font-logos/assets/font-logos.css"
-import type { Metadata, Viewport } from "next"
-import { Inter as FontSans } from "next/font/google"
-import { NextIntlClientProvider } from "next-intl"
-import { getLocale, getMessages } from "next-intl/server"
-import { PublicEnvScript } from "next-runtime-env"
-import { ThemeProvider } from "next-themes"
-import type React from "react"
-
-const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-})
-
-const customTitle = getEnv("NEXT_PUBLIC_CustomTitle")
-const customDescription = getEnv("NEXT_PUBLIC_CustomDescription")
-const disableIndex = getEnv("NEXT_PUBLIC_DisableIndex") === "true"
+import type { Metadata } from "next"
+import "./globals.css"
 
 export const metadata: Metadata = {
-  manifest: "/manifest.json",
-  title: customTitle || "NezhaDash Pro",
-  description: customDescription || "AI-Powered VPS Monitoring Dashboard with Alerts, Notifications, and Historical Data",
-  appleWebApp: {
-    capable: true,
-    title: customTitle || "NezhaDash",
-    statusBarStyle: "default",
-  },
-  robots: {
-    index: !disableIndex,
-    follow: !disableIndex,
-  },
-  openGraph: {
-    title: "NezhaDash Pro",
-    description: "AI-Powered VPS Monitoring Dashboard",
-    siteName: "NezhaDash Pro",
-    type: "website",
-  },
+  title: "NezhaDash Pro - AI-Powered VPS Monitoring",
+  description: "Advanced server monitoring dashboard with AI-powered alerts, multi-channel notifications, and real-time analytics",
 }
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-}
-
-export default async function LocaleLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale()
-  const messages = await getMessages()
-
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang="en" className="dark">
       <head>
-        <PublicEnvScript />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <meta name="theme-color" content="#111827" />
       </head>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", fontSans.variable)}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <NextIntlClientProvider messages={messages}>
-            <ThemeColorManager />
-            {children}
-          </NextIntlClientProvider>
-        </ThemeProvider>
+      <body className="min-h-screen bg-gray-900 antialiased">
+        {children}
       </body>
     </html>
   )
