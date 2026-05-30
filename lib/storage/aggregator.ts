@@ -82,12 +82,12 @@ export class MetricAggregator {
       const sum = values.reduce((a, b) => a + b, 0);
 
       aggregated.push({
-        serverId,
+        serverId: Number(serverId),
         metric,
         interval: step.to,
         timestamp: parseInt(bucketTs),
-        min: Math.min(...values),
-        max: Math.max(...values),
+        min: values.reduce((a, b) => Math.min(a, b), Infinity),
+        max: values.reduce((a, b) => Math.max(a, b), -Infinity),
         avg: sum / values.length,
         sum,
         count: values.length,
@@ -102,31 +102,31 @@ export class MetricAggregator {
     return aggregated.length;
   }
 
-  private getUnaggregatedSource(interval: AggregationInterval, before: number): Array<{ serverId: string; metric: string; value: number; timestamp: number }> {
+  private getUnaggregatedSource(interval: AggregationInterval, before: number): Array<{ serverId: number; metric: string; value: number; timestamp: number }> {
     // For raw 5s data
     if (interval === '5s') {
-      const storage = this.storage as any;
-      const rows = storage['db'].prepare(
+      const rows = this.storage.queryRaw(
         `SELECT server_id, metric, value, timestamp FROM raw_metrics
-         WHERE timestamp < ? ORDER BY server_id, metric, timestamp`
-      ).all(before) as Array<{ server_id: string; metric: string; value: number; timestamp: number }>;
+         WHERE timestamp < ? ORDER BY server_id, metric, timestamp`,
+        [before]
+      ) as Array<{ server_id: string; metric: string; value: number; timestamp: number }>;
 
       return rows.map(r => ({ serverId: r.server_id, metric: r.metric, value: r.value, timestamp: r.timestamp }));
     }
 
     // For aggregated intervals
-    const storage = this.storage as any;
-    const rows = storage['db'].prepare(
+    const rows = this.storage.queryRaw(
       `SELECT server_id, metric, avg as value, timestamp FROM aggregated_metrics
        WHERE interval_name = ? AND timestamp < ?
-       ORDER BY server_id, metric, timestamp`
-    ).all(interval, before) as Array<{ server_id: string; metric: string; value: number; timestamp: number }>;
+       ORDER BY server_id, metric, timestamp`,
+      [interval, before]
+    ) as Array<{ server_id: string; metric: string; value: number; timestamp: number }>;
 
     return rows.map(r => ({ serverId: r.server_id, metric: r.metric, value: r.value, timestamp: r.timestamp }));
   }
 
   private groupByTargetBucket(
-    points: Array<{ serverId: string; metric: string; value: number; timestamp: number }>,
+    points: Array<{ serverId: number; metric: string; value: number; timestamp: number }>,
     targetIntervalMs: number
   ): Map<string, Array<{ value: number; timestamp: number }>> {
     const groups = new Map<string, Array<{ value: number; timestamp: number }>>();
@@ -146,19 +146,19 @@ export class MetricAggregator {
     let total = 0;
     for (const [interval, retention] of Object.entries(DEFAULT_RETENTION) as Array<[AggregationInterval, number]>) {
       const cutoff = now - retention;
-      const storage = this.storage as any;
-      const result = storage['db'].prepare(
-        `DELETE FROM aggregated_metrics WHERE interval_name = ? AND timestamp < ?`
-      ).run(interval, cutoff);
+      const result = this.storage.executeRaw(
+        `DELETE FROM aggregated_metrics WHERE interval_name = ? AND timestamp < ?`,
+        [interval, cutoff]
+      );
       total += result.changes;
     }
 
     // Clean raw data older than the shortest retention
     const rawCutoff = now - DEFAULT_RETENTION['5s'];
-    const storage = this.storage as any;
-    const rawResult = storage['db'].prepare(
-      `DELETE FROM raw_metrics WHERE timestamp < ?`
-    ).run(rawCutoff);
+    const rawResult = this.storage.executeRaw(
+      `DELETE FROM raw_metrics WHERE timestamp < ?`,
+      [rawCutoff]
+    );
     total += rawResult.changes;
 
     return total;

@@ -29,18 +29,25 @@ export class DiscordNotifier implements Notifier {
     if (config.username) body.username = config.username;
     if (config.avatarUrl) body.avatar_url = config.avatarUrl;
 
-    const response = await fetch(config.webhookUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15_000);
+    try {
+      const response = await fetch(config.webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      throw new Error(`Discord webhook error ${response.status}: ${errorBody}`);
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`Discord webhook error ${response.status}: ${errorBody}`);
+      }
+
+      return true;
+    } finally {
+      clearTimeout(timeout);
     }
-
-    return true;
   }
 
   private buildEmbed(msg: NotificationMessage): Record<string, unknown> {

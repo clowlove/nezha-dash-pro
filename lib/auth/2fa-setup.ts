@@ -3,7 +3,7 @@
  * Manages the lifecycle of two-factor authentication for a user
  * Handles secret generation, encryption, storage, and verification
  */
-import { createCipheriv, createDecipheriv, randomBytes, scryptSync } from "node:crypto"
+import { createCipheriv, createDecipheriv, randomBytes, scryptSync, createHash } from "node:crypto"
 import {
   generateSecret,
   generateOTPAuthURL,
@@ -25,7 +25,10 @@ const CRYPTO_CONFIG = {
  * In production, use a proper secret management solution
  */
 function getEncryptionKey(): string {
-  const key = process.env.TWO_FACTOR_ENCRYPTION_KEY || process.env.SITE_PASSWORD || "nezha-dash-default-key"
+  const key = process.env.TWO_FACTOR_ENCRYPTION_KEY || process.env.SITE_PASSWORD
+  if (!key) {
+    throw new Error('TWO_FACTOR_ENCRYPTION_KEY environment variable is required for 2FA')
+  }
   return key
 }
 
@@ -133,7 +136,6 @@ function generateRecoveryCodes(count = 10): string[] {
  * Uses a simple hex encoding for demo; use bcrypt/scrypt in production
  */
 export function hashRecoveryCode(code: string): string {
-  const { createHash } = require("node:crypto")
   return createHash("sha256").update(code).digest("hex")
 }
 

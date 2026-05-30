@@ -262,8 +262,8 @@ function calculateSummaryFromRecords(
 
   const totalUpload = records.reduce((s, r) => s + r.upload, 0);
   const totalDownload = records.reduce((s, r) => s + r.download, 0);
-  const peakUpload = Math.max(...records.map(r => r.upload));
-  const peakDownload = Math.max(...records.map(r => r.download));
+  const peakUpload = records.reduce((max, r) => Math.max(max, r.upload), -Infinity);
+  const peakDownload = records.reduce((max, r) => Math.max(max, r.download), -Infinity);
 
   return {
     serverId, serverName, period, startTime, endTime,

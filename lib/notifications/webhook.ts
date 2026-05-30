@@ -37,18 +37,25 @@ export class WebhookNotifier implements Notifier {
       headers['X-Signature-256'] = `sha256=${signature}`;
     }
 
-    const response = await fetch(config.url, {
-      method: config.method || 'POST',
-      headers,
-      body,
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15_000);
+    try {
+      const response = await fetch(config.url, {
+        method: config.method || 'POST',
+        headers,
+        body,
+        signal: controller.signal,
+      });
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      throw new Error(`Webhook error ${response.status}: ${errorBody}`);
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`Webhook error ${response.status}: ${errorBody}`);
+      }
+
+      return true;
+    } finally {
+      clearTimeout(timeout);
     }
-
-    return true;
   }
 
   private buildPayload(msg: NotificationMessage): Record<string, unknown> {

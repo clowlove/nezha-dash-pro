@@ -39,7 +39,7 @@ export interface NotificationMessage {
   title: string;
   body: string;
   severity: AlertSeverity;
-  serverId?: string;
+  serverId?: number;
   serverName?: string;
   metric?: string;
   value?: number;
@@ -66,7 +66,7 @@ export interface NotificationLog {
 export interface AlertRule {
   id: string;
   name: string;
-  serverId?: string;
+  serverId?: number;
   metric: string;
   condition: 'gt' | 'lt' | 'eq' | 'gte' | 'lte';
   threshold: number;

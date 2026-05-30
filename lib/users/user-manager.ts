@@ -1,4 +1,4 @@
-import { randomBytes, pbkdf2Sync } from 'crypto';
+import { randomBytes, pbkdf2Sync, timingSafeEqual } from 'crypto';
 import {
   User, CreateUserInput, UpdateUserInput,
   Team, CreateTeamInput,
@@ -28,7 +28,10 @@ export function hashPassword(password: string, salt?: string): { hash: string; s
 
 export function verifyPassword(password: string, hash: string, salt: string): boolean {
   const { hash: computed } = hashPassword(password, salt);
-  return computed === hash;
+  const computedBuf = Buffer.from(computed);
+  const hashBuf = Buffer.from(hash);
+  if (computedBuf.length !== hashBuf.length) return false;
+  return timingSafeEqual(computedBuf, hashBuf);
 }
 
 // ── User CRUD ─────────────────────────────────────────────────────────────
@@ -155,7 +158,7 @@ export function deleteTeam(id: string): boolean {
 
 // ── Invitation system ─────────────────────────────────────────────────────
 function generateInviteToken(): string {
-  return randomBytes(32).toString('urlsafe-base64');
+  return randomBytes(32).toString('base64url');
 }
 
 export function createInvitation(input: InviteInput, invitedBy: string): Invitation {

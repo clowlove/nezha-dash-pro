@@ -143,14 +143,11 @@ export async function loadPlugin(pluginDirName: string): Promise<Plugin> {
     const code = await fs.readFile(entryPath, 'utf-8');
     const sandbox = createSandbox(manifest.id, manifest.permissions);
 
-    // Use a simple Function wrapper for sandboxed execution
-    const wrappedCode = `
-      (function(exports, require, module, console) {
-        ${code}
-      })
-    `;
-
-    const execute = eval(wrappedCode) as Function;
+    // Security: Use Function constructor instead of eval() for scoped execution.
+    // The plugin code runs with only the explicitly provided arguments (restrictedRequire, etc.)
+    // and has no access to the calling scope's variables. This is still dynamic code execution
+    // and relies on the module allowlist in createSandbox() to restrict available APIs.
+    const execute = new Function('exports', 'require', 'module', 'console', code) as Function;
     const moduleObj = { exports: {} as Record<string, unknown> };
 
     // Execute with timeout

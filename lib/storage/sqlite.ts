@@ -81,7 +81,7 @@ export class SqliteStorage implements StorageProvider {
     tx(points);
   }
 
-  getLatest(serverId: string, metric: string): MetricPoint | null {
+  getLatest(serverId: number, metric: string): MetricPoint | null {
     const row = this.db.prepare(
       `SELECT server_id, metric, value, timestamp FROM raw_metrics
        WHERE server_id = ? AND metric = ?
@@ -92,6 +92,14 @@ export class SqliteStorage implements StorageProvider {
     return { serverId: row.server_id, metric: row.metric, value: row.value, timestamp: row.timestamp };
   }
 
+  queryRaw(sql: string, params: unknown[]): unknown[] {
+    return this.db.prepare(sql).all(...params) as unknown[];
+  }
+
+  executeRaw(sql: string, params: unknown[]): { changes: number } {
+    return this.db.prepare(sql).run(...params) as { changes: number };
+  }
+
   query(options: QueryOptions): AggregatedMetric[] {
     const { serverId, metric, range, limit } = options;
     const rangeMs = range.end - range.start;
@@ -99,7 +107,7 @@ export class SqliteStorage implements StorageProvider {
 
     // For raw 5s interval, query raw_metrics directly
     if (interval === '5s') {
-      return this.queryRaw(serverId, metric, range, limit);
+      return this.queryRawMetrics(serverId, metric, range, limit);
     }
 
     // Check if aggregated data exists, fallback to raw if not
@@ -109,7 +117,7 @@ export class SqliteStorage implements StorageProvider {
     return this.queryAndAggregate(serverId, metric, interval, range, limit);
   }
 
-  private queryRaw(serverId: string, metric: string, range: { start: number; end: number }, limit?: number): AggregatedMetric[] {
+  private queryRawMetrics(serverId: number, metric: string, range: { start: number; end: number }, limit?: number): AggregatedMetric[] {
     let sql = `SELECT server_id, metric, value, timestamp FROM raw_metrics
                WHERE server_id = ? AND metric = ? AND timestamp >= ? AND timestamp <= ?
                ORDER BY timestamp ASC`;
@@ -133,7 +141,7 @@ export class SqliteStorage implements StorageProvider {
     }));
   }
 
-  private queryAggregated(serverId: string, metric: string, interval: AggregationInterval, range: { start: number; end: number }, limit?: number): AggregatedMetric[] {
+  private queryAggregated(serverId: number, metric: string, interval: AggregationInterval, range: { start: number; end: number }, limit?: number): AggregatedMetric[] {
     let sql = `SELECT * FROM aggregated_metrics
                WHERE server_id = ? AND metric = ? AND interval_name = ? AND timestamp >= ? AND timestamp <= ?
                ORDER BY timestamp ASC`;
@@ -158,7 +166,7 @@ export class SqliteStorage implements StorageProvider {
     }));
   }
 
-  private queryAndAggregate(serverId: string, metric: string, interval: AggregationInterval, range: { start: number; end: number }, limit?: number): AggregatedMetric[] {
+  private queryAndAggregate(serverId: number, metric: string, interval: AggregationInterval, range: { start: number; end: number }, limit?: number): AggregatedMetric[] {
     const intervalMs = INTERVAL_MS[interval];
     const rawRows = this.db.prepare(
       `SELECT value, timestamp FROM raw_metrics
@@ -186,8 +194,8 @@ export class SqliteStorage implements StorageProvider {
         metric,
         interval,
         timestamp: ts,
-        min: Math.min(...values),
-        max: Math.max(...values),
+        min: values.reduce((a, b) => Math.min(a, b), Infinity),
+        max: values.reduce((a, b) => Math.max(a, b), -Infinity),
         avg: sum / values.length,
         sum,
         count: values.length,

@@ -52,7 +52,7 @@ export class SSHManager {
 
   private async buildSSHArgs(config: SSHConfig, command: string): Promise<string[]> {
     const args: string[] = [
-      '-o', 'StrictHostKeyChecking=no',
+      '-o', 'StrictHostKeyChecking=accept-new',
       '-o', 'UserKnownHostsFile=/dev/null',
       '-o', 'ConnectTimeout=' + (config.timeout || 10),
       '-o', 'BatchMode=yes',
@@ -82,7 +82,7 @@ export class SSHManager {
     try {
       const args = await this.buildSSHArgs(config, command);
       const sshCmd = config.authMethod === 'password' && config.password
-        ? `sshpass -p ${JSON.stringify(config.password)} ssh ${args.map((a) => JSON.stringify(a)).join(' ')}`
+        ? `SSHPASS=${JSON.stringify(config.password)} sshpass -e ssh ${args.map((a) => JSON.stringify(a)).join(' ')}`
         : `ssh ${args.map((a) => JSON.stringify(a)).join(' ')}`;
 
       return await new Promise<SSHResult>((resolve) => {

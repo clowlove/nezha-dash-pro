@@ -14,6 +14,43 @@ const MAX_RETRY_ATTEMPTS = 3;
 const RETRY_DELAYS = [1000, 5000, 15000]; // Exponential backoff in ms
 const TIMEOUT_MS = 10000;
 
+/** Validate that a webhook URL does not target private/internal IPs (SSRF protection) */
+function validateWebhookUrl(urlStr: string): void {
+  let parsed: URL;
+  try {
+    parsed = new URL(urlStr);
+  } catch {
+    throw new Error('Invalid webhook URL');
+  }
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+    throw new Error('Webhook URL must use http or https protocol');
+  }
+  const hostname = parsed.hostname;
+  // Reject IPv6 loopback
+  if (hostname === '::1' || hostname === '[::1]') {
+    throw new Error('Webhook URL must not target private/internal addresses');
+  }
+  // Reject IPv6 private ranges
+  if (/^(fc|fd|fe80):/i.test(hostname) || /^\[?(fc|fd|fe80):/i.test(hostname)) {
+    throw new Error('Webhook URL must not target private/internal addresses');
+  }
+  // Strip brackets from IPv6 for matching
+  const cleanHost = hostname.replace(/^\[|\]$/g, '');
+  // Reject IPv4 private/loopback/link-local ranges
+  const ipv4Match = cleanHost.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (ipv4Match) {
+    const [, a, b] = ipv4Match.map(Number);
+    if (a === 10 ||
+        (a === 172 && b >= 16 && b <= 31) ||
+        (a === 192 && b === 168) ||
+        a === 127 ||
+        a === 0 ||
+        (a === 169 && b === 254)) {
+      throw new Error('Webhook URL must not target private/internal addresses');
+    }
+  }
+}
+
 function generateId(): string {
   return randomBytes(16).toString('hex');
 }
@@ -43,6 +80,7 @@ export class WebhookManager {
   // ===== CRUD Operations =====
 
   async create(input: WebhookCreateInput, userId: string): Promise<Webhook> {
+    validateWebhookUrl(input.url);
     const now = new Date().toISOString();
     const webhook: Webhook = {
       id: generateId(),
@@ -82,6 +120,7 @@ export class WebhookManager {
   async update(id: string, input: WebhookUpdateInput): Promise<Webhook | null> {
     const webhook = webhooks.get(id);
     if (!webhook) return null;
+    if (input.url) validateWebhookUrl(input.url);
 
     const updated: Webhook = {
       ...webhook,

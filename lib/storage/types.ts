@@ -3,7 +3,7 @@
  */
 
 export interface MetricPoint {
-  serverId: string;
+  serverId: number;
   metric: string;
   value: number;
   timestamp: number; // Unix ms
@@ -17,7 +17,7 @@ export interface TimeRange {
 export type AggregationInterval = '5s' | '1min' | '5min' | '30min' | '2h' | '1d';
 
 export interface AggregatedMetric {
-  serverId: string;
+  serverId: number;
   metric: string;
   interval: AggregationInterval;
   timestamp: number; // Bucket start time
@@ -30,7 +30,7 @@ export interface AggregatedMetric {
 }
 
 export interface QueryOptions {
-  serverId: string;
+  serverId: number;
   metric: string;
   range: TimeRange;
   interval?: AggregationInterval;
@@ -41,7 +41,9 @@ export interface StorageProvider {
   store(point: MetricPoint): void;
   storeBatch(points: MetricPoint[]): void;
   query(options: QueryOptions): AggregatedMetric[];
-  getLatest(serverId: string, metric: string): MetricPoint | null;
+  getLatest(serverId: number, metric: string): MetricPoint | null;
+  queryRaw(sql: string, params: unknown[]): unknown[];
+  executeRaw(sql: string, params: unknown[]): { changes: number };
   cleanup(olderThan: number): number; // returns deleted count
   close(): void;
 }

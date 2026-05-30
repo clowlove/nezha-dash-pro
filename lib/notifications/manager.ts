@@ -2,6 +2,7 @@
  * NotificationManager - routes alerts to configured notification channels
  */
 
+import { randomUUID } from 'crypto';
 import {
   NotificationChannel,
   NotificationMessage,
@@ -112,7 +113,7 @@ export class NotificationManager {
     error?: string
   ): NotificationLog {
     return {
-      id: `log_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      id: randomUUID(),
       channelId,
       messageId,
       status,

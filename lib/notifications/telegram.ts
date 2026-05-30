@@ -28,19 +28,26 @@ export class TelegramNotifier implements Notifier {
       disable_web_page_preview: true,
     };
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15_000);
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      throw new Error(`Telegram API error ${response.status}: ${errorBody}`);
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`Telegram API error ${response.status}: ${errorBody}`);
+      }
+
+      const result = await response.json();
+      return result.ok === true;
+    } finally {
+      clearTimeout(timeout);
     }
-
-    const result = await response.json();
-    return result.ok === true;
   }
 
   private formatMessage(msg: NotificationMessage): string {
