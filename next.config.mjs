@@ -33,5 +33,9 @@ const nextConfig = {
       fullUrl: true,
     },
   },
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
+  poweredByHeader: false,
 }
 export default bundleAnalyzer(withPWA(withNextIntl(nextConfig)))

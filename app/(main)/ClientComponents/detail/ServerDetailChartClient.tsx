@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
+import { useMemo } from "react"
 import { Area, AreaChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
 import {
   MAX_HISTORY_LENGTH,
@@ -96,11 +97,10 @@ export default function ServerDetailChartClient({ server_id }: { server_id: numb
 
 function CpuChart({ history, data }: { history: ServerDataWithTimestamp[]; data: NezhaAPISafe }) {
   const { cpu } = formatNezhaInfo(data)
-  const cpuChartData = buildServerMetricHistory({
-    data,
-    history,
-    select: (server) => ({ cpu: server.cpu }),
-  })
+  const cpuChartData = useMemo(
+    () => buildServerMetricHistory({ data, history, select: (server) => ({ cpu: server.cpu }) }),
+    [data, history],
+  )
 
   const chartConfig = {
     cpu: {
@@ -171,11 +171,10 @@ function CpuChart({ history, data }: { history: ServerDataWithTimestamp[]; data:
 
 function GpuChart({ history, data }: { history: ServerDataWithTimestamp[]; data: NezhaAPISafe }) {
   const { gpu } = formatNezhaInfo(data)
-  const gpuChartData = buildServerMetricHistory({
-    data,
-    history,
-    select: (server) => ({ gpu: server.gpu }),
-  })
+  const gpuChartData = useMemo(
+    () => buildServerMetricHistory({ data, history, select: (server) => ({ gpu: server.gpu }) }),
+    [data, history],
+  )
 
   const chartConfig = {
     gpu: {
@@ -253,11 +252,10 @@ function ProcessChart({
 }) {
   const t = useTranslations("ServerDetailChartClient")
   const { process } = formatNezhaInfo(data)
-  const processChartData = buildServerMetricHistory({
-    data,
-    history,
-    select: (server) => ({ process: server.process }),
-  })
+  const processChartData = useMemo(
+    () => buildServerMetricHistory({ data, history, select: (server) => ({ process: server.process }) }),
+    [data, history],
+  )
 
   const chartConfig = {
     process: {
@@ -315,11 +313,10 @@ function ProcessChart({
 function MemChart({ data, history }: { data: NezhaAPISafe; history: ServerDataWithTimestamp[] }) {
   const t = useTranslations("ServerDetailChartClient")
   const { mem, swap } = formatNezhaInfo(data)
-  const memChartData = buildServerMetricHistory({
-    data,
-    history,
-    select: (server) => ({ mem: server.mem, swap: server.swap }),
-  })
+  const memChartData = useMemo(
+    () => buildServerMetricHistory({ data, history, select: (server) => ({ mem: server.mem, swap: server.swap }) }),
+    [data, history],
+  )
 
   const chartConfig = {
     mem: {
@@ -427,11 +424,10 @@ function MemChart({ data, history }: { data: NezhaAPISafe; history: ServerDataWi
 function DiskChart({ data, history }: { data: NezhaAPISafe; history: ServerDataWithTimestamp[] }) {
   const t = useTranslations("ServerDetailChartClient")
   const { disk } = formatNezhaInfo(data)
-  const diskChartData = buildServerMetricHistory({
-    data,
-    history,
-    select: (server) => ({ disk: server.disk }),
-  })
+  const diskChartData = useMemo(
+    () => buildServerMetricHistory({ data, history, select: (server) => ({ disk: server.disk }) }),
+    [data, history],
+  )
 
   const chartConfig = {
     disk: {
@@ -514,11 +510,10 @@ function NetworkChart({
 }) {
   const t = useTranslations("ServerDetailChartClient")
   const { up, down } = formatNezhaInfo(data)
-  const networkChartData = buildServerMetricHistory({
-    data,
-    history,
-    select: (server) => ({ upload: server.up, download: server.down }),
-  })
+  const networkChartData = useMemo(
+    () => buildServerMetricHistory({ data, history, select: (server) => ({ upload: server.up, download: server.down }) }),
+    [data, history],
+  )
 
   let maxDownload = Math.max(...networkChartData.map((item) => item.download))
   maxDownload = Math.ceil(maxDownload)
@@ -620,11 +615,10 @@ function ConnectChart({
   history: ServerDataWithTimestamp[]
 }) {
   const { tcp, udp } = formatNezhaInfo(data)
-  const connectChartData = buildServerMetricHistory({
-    data,
-    history,
-    select: (server) => ({ tcp: server.tcp, udp: server.udp }),
-  })
+  const connectChartData = useMemo(
+    () => buildServerMetricHistory({ data, history, select: (server) => ({ tcp: server.tcp, udp: server.udp }) }),
+    [data, history],
+  )
 
   const chartConfig = {
     tcp: {

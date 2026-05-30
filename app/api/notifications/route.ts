@@ -22,6 +22,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/notifications - Create channel, test, or send
 export async function POST(request: NextRequest) {
+  try {
   const manager = getNotificationManager();
   const body = await request.json();
   const { action } = body;
@@ -75,10 +76,15 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ error: 'Invalid action. Use: create, test, send' }, { status: 400 });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Internal server error';
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }
 
 // PUT /api/notifications - Update a channel
 export async function PUT(request: NextRequest) {
+  try {
   const manager = getNotificationManager();
   const body = await request.json();
   const { channelId, ...updates } = body;
@@ -93,10 +99,15 @@ export async function PUT(request: NextRequest) {
   }
 
   return NextResponse.json({ channel: updated });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Internal server error';
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }
 
 // DELETE /api/notifications - Remove a channel
 export async function DELETE(request: NextRequest) {
+  try {
   const manager = getNotificationManager();
   const { searchParams } = new URL(request.url);
   const channelId = searchParams.get('channelId');
@@ -111,4 +122,8 @@ export async function DELETE(request: NextRequest) {
   }
 
   return NextResponse.json({ success: true });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Internal server error';
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }

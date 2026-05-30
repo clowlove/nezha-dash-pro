@@ -1,3 +1,4 @@
+import { memo } from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import ServerFlag from "@/components/ServerFlag"
@@ -9,7 +10,7 @@ import getEnv from "@/lib/env-entry"
 import { GetFontLogoClass, GetOsName, MageMicrosoftWindows } from "@/lib/logo-class"
 import { cn, formatBytes, formatNezhaInfo } from "@/lib/utils"
 
-export default function ServerCard({ serverInfo }: { serverInfo: NezhaAPISafe }) {
+export default memo(function ServerCard({ serverInfo }: { serverInfo: NezhaAPISafe }) {
   const t = useTranslations("ServerCard")
   const { id, name, country_code, online, cpu, up, down, mem, stg, host } =
     formatNezhaInfo(serverInfo)
@@ -170,4 +171,4 @@ export default function ServerCard({ serverInfo }: { serverInfo: NezhaAPISafe })
       </Card>
     </Link>
   )
-}
+})

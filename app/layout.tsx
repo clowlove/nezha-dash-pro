@@ -34,6 +34,12 @@ export const metadata: Metadata = {
     index: !disableIndex,
     follow: !disableIndex,
   },
+  openGraph: {
+    title: "NezhaDash Pro",
+    description: "AI-Powered VPS Monitoring Dashboard",
+    siteName: "NezhaDash Pro",
+    type: "website",
+  },
 }
 
 export const viewport: Viewport = {

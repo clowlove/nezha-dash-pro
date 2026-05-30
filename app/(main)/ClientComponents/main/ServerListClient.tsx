@@ -3,7 +3,7 @@
 import { MapIcon, ViewColumnsIcon } from "@heroicons/react/20/solid"
 import dynamic from "next/dynamic"
 import { useTranslations } from "next-intl"
-import { type RefObject, useEffect, useRef, useState } from "react"
+import { type RefObject, useEffect, useMemo, useRef, useState } from "react"
 import { useFilter } from "@/app/context/network-filter-context"
 import { useServerData } from "@/app/context/server-data-context"
 import { useStatus } from "@/app/context/status-context"
@@ -172,19 +172,24 @@ export default function ServerListClient() {
   if (!data?.result) return <LoadingState t={t} />
 
   const { result } = data
-  const sortedServers = sortServersByDisplayIndex(result)
-  const filteredServersByStatus = filterServersByStatus(sortedServers, status)
-  const allTag = filteredServersByStatus.map((server) => server.tag).filter(Boolean)
-  const uniqueTags = [...new Set(allTag)]
-  uniqueTags.unshift(defaultTag)
+  const sortedServers = useMemo(() => sortServersByDisplayIndex(result), [result])
+  const filteredServersByStatus = useMemo(() => filterServersByStatus(sortedServers, status), [sortedServers, status])
+  const uniqueTags = useMemo(() => {
+    const allTag = filteredServersByStatus.map((server) => server.tag).filter(Boolean)
+    const tags = [...new Set(allTag)]
+    tags.unshift(defaultTag)
+    return tags
+  }, [filteredServersByStatus])
 
-  let filteredServers = filterServersByTag(filteredServersByStatus, tag, defaultTag)
+  const filteredServers = useMemo(() => {
+    let servers = filterServersByTag(filteredServersByStatus, tag, defaultTag)
+    if (filter) {
+      servers = sortServersByNetwork(servers)
+    }
+    return servers
+  }, [filteredServersByStatus, tag, defaultTag, filter])
 
-  if (filter) {
-    filteredServers = sortServersByNetwork(filteredServers)
-  }
-
-  const tagCountMap = getTagCounts(filteredServersByStatus)
+  const tagCountMap = useMemo(() => getTagCounts(filteredServersByStatus), [filteredServersByStatus])
 
   return (
     <>

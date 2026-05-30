@@ -4,7 +4,7 @@ import { Activity, Home, Languages, Moon, Sun, SunMoon } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { useTheme } from "next-themes"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useCommand } from "@/app/context/command-context"
 import { useServerData } from "@/app/context/server-data-context"
 import {
@@ -39,13 +39,16 @@ export function DashCommand() {
     return () => document.removeEventListener("keydown", down)
   }, [toggleCommand])
 
-  if (!data?.result) return null
+  const sortedServers = useMemo(() => {
+    if (!data?.result) return null
+    return [...data.result].sort((a, b) => {
+      const displayIndexDiff = (b.display_index || 0) - (a.display_index || 0)
+      if (displayIndexDiff !== 0) return displayIndexDiff
+      return a.id - b.id
+    })
+  }, [data?.result])
 
-  const sortedServers = data.result.sort((a, b) => {
-    const displayIndexDiff = (b.display_index || 0) - (a.display_index || 0)
-    if (displayIndexDiff !== 0) return displayIndexDiff
-    return a.id - b.id
-  })
+  if (!sortedServers) return null
 
   const languageShortcuts = localeItems.map((item) => ({
     keywords: ["language", "locale", item.code.toLowerCase()],

@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo } from "react"
 import GlobalInfo from "@/app/(main)/ClientComponents/main/GlobalInfo"
 import { InteractiveMap } from "@/app/(main)/ClientComponents/main/InteractiveMap"
 import { useServerData } from "@/app/context/server-data-context"
@@ -22,30 +23,34 @@ export default function ServerGlobal() {
     return <GlobalLoading />
   }
 
-  const countryList: string[] = []
-  const serverCounts: { [key: string]: number } = {}
+  const { countryList, serverCounts } = useMemo(() => {
+    const countryList: string[] = []
+    const serverCounts: { [key: string]: number } = {}
 
-  for (const server of nezhaServerList.result) {
-    if (server.host.CountryCode) {
-      // Convert emoji flags or country identifiers to standard country codes for map display
-      const countryCode = getCountryCodeForMap(server.host.CountryCode)
+    for (const server of nezhaServerList.result) {
+      if (server.host.CountryCode) {
+        const countryCode = getCountryCodeForMap(server.host.CountryCode)
 
-      if (countryCode) {
-        if (!countryList.includes(countryCode)) {
-          countryList.push(countryCode)
+        if (countryCode) {
+          if (!countryList.includes(countryCode)) {
+            countryList.push(countryCode)
+          }
+          serverCounts[countryCode] = (serverCounts[countryCode] || 0) + 1
         }
-        serverCounts[countryCode] = (serverCounts[countryCode] || 0) + 1
       }
     }
-  }
+    return { countryList, serverCounts }
+  }, [nezhaServerList])
 
   const width = 900
   const height = 500
 
-  const geoJson = JSON.parse(geoJsonString)
-  const filteredFeatures = geoJson.features.filter(
-    (feature: any) => feature.properties.iso_a3_eh !== "",
-  )
+  const filteredFeatures = useMemo(() => {
+    const geoJson = JSON.parse(geoJsonString)
+    return geoJson.features.filter(
+      (feature: any) => feature.properties.iso_a3_eh !== "",
+    )
+  }, [])
 
   return (
     <section className="mt-[3.2px] flex flex-col gap-4">

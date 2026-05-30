@@ -1,3 +1,4 @@
+import { memo } from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import ServerFlag from "@/components/ServerFlag"
@@ -10,7 +11,7 @@ import { cn, formatBytes, formatNezhaInfo } from "@/lib/utils"
 
 import { Separator } from "./ui/separator"
 
-export default function ServerCardInline({ serverInfo }: { serverInfo: NezhaAPISafe }) {
+export default memo(function ServerCardInline({ serverInfo }: { serverInfo: NezhaAPISafe }) {
   const t = useTranslations("ServerCard")
   const { id, name, country_code, online, cpu, up, down, mem, stg, host } =
     formatNezhaInfo(serverInfo)
@@ -153,4 +154,4 @@ export default function ServerCardInline({ serverInfo }: { serverInfo: NezhaAPIS
       </Card>
     </Link>
   )
-}
+})

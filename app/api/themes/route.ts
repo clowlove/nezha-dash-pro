@@ -4,6 +4,7 @@ import { ThemeConfig, ColorScheme } from "@/lib/themes/types";
 
 // GET /api/themes - List all preset themes
 export async function GET(request: NextRequest) {
+  try {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
 
@@ -37,6 +38,10 @@ export async function GET(request: NextRequest) {
   }));
 
   return NextResponse.json({ themes, count: themes.length });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Internal server error';
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }
 
 // POST /api/themes - Create/validate a custom theme

@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/history - Ingest metrics or trigger aggregation
 export async function POST(request: NextRequest) {
+  try {
   const body = await request.json();
   const { action } = body;
 
@@ -93,6 +94,10 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ error: 'Invalid action. Use: ingest, aggregate, cleanup' }, { status: 400 });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Internal server error';
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
 }
 
 function parseTimeRange(range: string): number {

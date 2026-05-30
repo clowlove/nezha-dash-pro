@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo } from "react"
 import { geoEquirectangular, geoPath } from "d3-geo"
 import MapTooltip from "@/app/(main)/ClientComponents/main/MapTooltip"
 import { useTooltip } from "@/app/context/tooltip-context"
@@ -25,12 +26,34 @@ export function InteractiveMap({
 }: InteractiveMapProps) {
   const { setTooltipData } = useTooltip()
 
-  const projection = geoEquirectangular()
-    .scale(140)
-    .translate([width / 2, height / 2])
-    .rotate([-12, 0, 0])
+  const projection = useMemo(
+    () =>
+      geoEquirectangular()
+        .scale(140)
+        .translate([width / 2, height / 2])
+        .rotate([-12, 0, 0]),
+    [width, height],
+  )
 
-  const path = geoPath().projection(projection)
+  const path = useMemo(() => geoPath().projection(projection), [projection])
+
+  const countryServersMap = useMemo(() => {
+    const map = new Map<string, Array<{ id: number; name: string; status: boolean }>>()
+    for (const server of nezhaServerList.result) {
+      const serverCountryCode = getCountryCodeForMap(server.host.CountryCode)
+      if (serverCountryCode) {
+        if (!map.has(serverCountryCode)) {
+          map.set(serverCountryCode, [])
+        }
+        map.get(serverCountryCode)!.push({
+          id: server.id,
+          name: server.name,
+          status: server.online_status,
+        })
+      }
+    }
+    return map
+  }, [nezhaServerList])
 
   return (
     <div className="relative aspect-2/1 w-full" onMouseLeave={() => setTooltipData(null)}>
@@ -78,16 +101,7 @@ export function InteractiveMap({
                   }
                   if (path.centroid(feature)) {
                     const countryCode = feature.properties.iso_a2_eh
-                    const countryServers = nezhaServerList.result
-                      .filter((server: any) => {
-                        const serverCountryCode = getCountryCodeForMap(server.host.CountryCode)
-                        return serverCountryCode === countryCode
-                      })
-                      .map((server: any) => ({
-                        id: server.id,
-                        name: server.name,
-                        status: server.online_status,
-                      }))
+                    const countryServers = countryServersMap.get(countryCode) || []
                     setTooltipData({
                       centroid: path.centroid(feature),
                       country: feature.properties.name,
@@ -122,16 +136,7 @@ export function InteractiveMap({
               <g
                 key={countryCode}
                 onMouseEnter={() => {
-                  const countryServers = nezhaServerList.result
-                    .filter((server: any) => {
-                      const serverCountryCode = getCountryCodeForMap(server.host.CountryCode)
-                      return serverCountryCode === countryCode
-                    })
-                    .map((server: any) => ({
-                      id: server.id,
-                      name: server.name,
-                      status: server.online_status,
-                    }))
+                  const countryServers = countryServersMap.get(countryCode) || []
                   setTooltipData({
                     centroid: [x, y],
                     country: coords.name,
