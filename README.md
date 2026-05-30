@@ -12,7 +12,7 @@
 [![Tailwind](https://img.shields.io/badge/Tailwind-4.3-06B6D4?logo=tailwindcss)](https://tailwindcss.com)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://docker.com)
 
-基于 [nezha-dash](https://github.com/hamster1963/nezha-dash) 深度优化的 **Pro 版本**，新增 **22个功能模块**、**38,000+ 行代码**、**100+ 项优化**。
+基于 [nezha-dash](https://github.com/hamster1963/nezha-dash) 深度优化的 **Pro 版本**，新增 **30+ 功能模块**、**45,000+ 行代码**、**120+ 项优化**。
 
 </div>
 
@@ -21,6 +21,10 @@
 ## 📋 目录
 
 - [✨ 核心功能](#-核心功能)
+- [🧠 AI智能引擎](#-ai智能引擎)
+- [⚡ 核心架构升级](#-核心架构升级)
+- [🎨 UI革命](#-ui革命)
+- [🏭 生产级基础设施](#-生产级基础设施)
 - [🏗️ 技术架构](#️-技术架构)
 - [📊 优化清单](#-优化清单)
 - [🚀 快速开始](#-快速开始)
@@ -243,6 +247,17 @@
 | 2 | AVIF/WebP | next.config.mjs | 现代图片格式 |
 | 3 | docker-compose | docker/ | 健康检查+数据卷 |
 
+### 🧠 AI优化（6项）
+
+| # | 优化 | 文件 | 说明 |
+|---|------|------|------|
+| 1 | 异常检测 | anomaly-detector.ts | Z-score/IQR/移动平均 |
+| 2 | 预测分析 | predictor.ts | 趋势预测+容量规划 |
+| 3 | 事件总线 | event-bus.ts | 解耦通信 |
+| 4 | 多级缓存 | cache.ts | L1内存+L2 Redis |
+| 5 | 实时推送 | realtime.ts | WebSocket |
+| 6 | 结构化日志 | logger.ts | 请求追踪 |
+
 ---
 
 ## 🚀 快速开始
@@ -435,6 +450,95 @@ export function onAlert(ctx, alert) {
 | **Enterprise** | ¥999永久 | +定制开发+优先支持 |
 
 ---
+
+## 🧠 AI智能引擎
+
+### 异常检测
+- Z-score统计检测
+- IQR四分位距检测
+- 移动平均偏差检测
+- 集成投票（任意/多数/全部）
+- 自动阈值调整
+
+### 预测分析
+- 线性回归趋势预测
+- 磁盘容量预估
+- 成本趋势投影
+- 置信度分类（高/中/低）
+- 可操作建议生成
+
+## ⚡ 核心架构升级
+
+### 事件驱动架构
+- 类型化事件总线
+- 通配符订阅（server:*）
+- 异步处理器
+- 优先级排序
+- 事件回放
+
+### 多级缓存
+- L1内存缓存（TTL+LRU）
+- L2 Redis接口
+- 标签失效
+- 防惊跳
+
+### 中间件管道
+- 可组合中间件
+- 速率限制（滑动窗口）
+- CORS
+- 请求日志
+- 错误边界
+
+### 实时通信
+- WebSocket服务器
+- 频道订阅
+- 实时指标推送
+- 告警通知
+
+### 结构化日志
+- 5级日志（debug→fatal）
+- 请求追踪
+- 日志轮转
+
+## 🎨 UI革命
+
+### 新组件
+- 玻璃拟态卡片（GlassCard）
+- 5种骨架屏加载器
+- 动画指标徽章（计数器+趋势箭头+迷你图）
+- 状态脉冲指示器
+- 快捷操作面板
+- 服务器网格（拖拽排序）
+- 告警时间线
+- 系统健康仪表盘
+
+### CSS动画库
+- 淡入/滑入/缩放/脉冲/闪光/打字机
+- 渐变背景（网格/头部/发光）
+- 毛玻璃效果
+
+## 🏭 生产级基础设施
+
+### Kubernetes
+- Deployment（2副本+资源限制+探针）
+- Service（HTTP+WebSocket）
+- Ingress（TLS+限流+HSTS）
+
+### Docker生产版
+- 多服务（App+Redis+Nginx）
+- 资源限制+日志+健康检查
+- Nginx反向代理（gzip+缓存+安全头）
+
+### 测试
+- 告警管理器测试
+- 通知器测试
+- SQLite存储测试
+- Vitest配置（70%覆盖率目标）
+
+### 运维工具
+- 种子数据脚本
+- 数据库备份脚本（gzip+旋转+S3接口）
+- 安全策略文档
 
 ## 🤝 贡献
 
