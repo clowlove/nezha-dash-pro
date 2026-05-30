@@ -1,7 +1,7 @@
 {
   "name": "NezhaDash Pro",
   "short_name": "NezhaDash",
-  "description": "Modern server monitoring dashboard with real-time metrics, alerts, and network insights.",
+  "description": "AI-Powered VPS Monitoring Dashboard with real-time metrics, alerts, notifications, and network insights.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

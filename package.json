@@ -1,6 +1,7 @@
 {
-  "name": "nezha-dash",
-  "version": "3.1.11",
+  "name": "nezha-dash-pro",
+  "version": "1.0.0",
+  "description": "NezhaDash Pro — AI-Powered VPS Monitoring Dashboard with Alerts, Notifications, Historical Data, Themes, and SaaS",
   "private": true,
   "packageManager": "pnpm@10.29.3",
   "scripts": {

@@ -1,4 +1,7 @@
-FROM --platform=$BUILDPLATFORM node:25-alpine AS base
+FROM --platform=$BUILDPLATFORM node:22-alpine AS base
+LABEL maintainer="clowlove" \
+      description="NezhaDash Pro — AI-Powered VPS Monitoring Dashboard" \
+      version="1.0.0"
 RUN npm install -g pnpm@10.29.3
 WORKDIR /app
 

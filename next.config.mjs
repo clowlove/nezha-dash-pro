@@ -28,14 +28,14 @@ const nextConfig = {
   },
   reactCompiler: true,
   output: "standalone",
+  poweredByHeader: false,
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   logging: {
     fetches: {
       fullUrl: true,
     },
   },
-  images: {
-    formats: ["image/avif", "image/webp"],
-  },
-  poweredByHeader: false,
 }
 export default bundleAnalyzer(withPWA(withNextIntl(nextConfig)))
