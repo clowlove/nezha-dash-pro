@@ -40,6 +40,8 @@ export class DriverManager implements IDriverManager {
     const isKomariMode = getEnv("NEXT_PUBLIC_Komari") === "true"
     const hasMyNodeQueryConfig = !!getEnv("MyNodeQueryBaseUrl")
     const hasKomariConfig = !!getEnv("KomariBaseUrl")
+    const isUptimeKumaMode = getEnv("NEXT_PUBLIC_UptimeKuma") === "true"
+    const hasUptimeKumaConfig = !!getEnv("UptimeKumaBaseUrl") && !!getEnv("UptimeKumaApiKey")
     const hasNezhaConfig = !!getEnv("NezhaBaseUrl") && !!getEnv("NezhaAuth")
     const driverPreferences: SupportedDriverType[] = []
 
@@ -56,6 +58,14 @@ export class DriverManager implements IDriverManager {
         driverPreferences.push("komari")
       } else {
         console.warn("Komari mode enabled but KomariBaseUrl is not configured")
+      }
+    }
+
+    if (isUptimeKumaMode) {
+      if (hasUptimeKumaConfig) {
+        driverPreferences.push("uptimekuma")
+      } else {
+        console.warn("Uptime Kuma mode enabled but UptimeKumaBaseUrl/UptimeKumaApiKey is not configured")
       }
     }
 
@@ -248,6 +258,33 @@ export class DriverManager implements IDriverManager {
         }
       }
 
+      case "uptimekuma": {
+        const baseUrl = getEnv("UptimeKumaBaseUrl") || ""
+        const auth = getEnv("UptimeKumaApiKey") || ""
+
+        if (!baseUrl) {
+          throw new DriverOperationError(
+            "manager",
+            "createDriverConfig",
+            "UptimeKumaBaseUrl is required for Uptime Kuma driver",
+          )
+        }
+        if (!auth) {
+          throw new DriverOperationError(
+            "manager",
+            "createDriverConfig",
+            "UptimeKumaApiKey is required for Uptime Kuma driver",
+          )
+        }
+
+        return {
+          baseUrl,
+          auth,
+          timeout: 30000,
+          revalidate: 0,
+        }
+      }
+
       default:
         throw new DriverOperationError(
           "manager",
@@ -264,7 +301,7 @@ export class DriverManager implements IDriverManager {
     const availableDrivers = this.getAvailableDrivers()
 
     // Priority order for auto-detection
-    const detectionOrder: SupportedDriverType[] = ["nezha", "komari", "mynodequery"]
+    const detectionOrder: SupportedDriverType[] = ["nezha", "komari", "mynodequery", "uptimekuma"]
 
     for (const driverType of detectionOrder) {
       if (!availableDrivers.includes(driverType)) continue

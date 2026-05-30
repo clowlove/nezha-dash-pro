@@ -5,6 +5,7 @@
 import { KomariDriver } from "./komari"
 import { MyNodeQueryDriver } from "./mynodequery"
 import { NezhaDriver } from "./nezha"
+import { UptimeKumaDriver } from "./uptimekuma"
 import type { DriverConfig, IDataSourceDriver, IDriverFactory } from "./types"
 import { DriverNotFoundError } from "./types"
 
@@ -15,6 +16,7 @@ const DRIVER_REGISTRY = {
   nezha: () => new NezhaDriver(),
   komari: () => new KomariDriver(),
   mynodequery: () => new MyNodeQueryDriver(),
+  uptimekuma: () => new UptimeKumaDriver(),
 } as const
 
 export type SupportedDriverType = keyof typeof DRIVER_REGISTRY

@@ -12,6 +12,7 @@ export { DriverManager, getDriverManager, initializeDriverManager } from "./mana
 export { MyNodeQueryDriver } from "./mynodequery"
 // Concrete driver implementations
 export { NezhaDriver } from "./nezha"
+export { UptimeKumaDriver } from "./uptimekuma"
 // Core types and interfaces
 export type {
   DriverCapabilities,
