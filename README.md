@@ -2,503 +2,486 @@
 
 # 🚀 NezhaDash Pro
 
-### 新一代服务器监控面板 — 强大、优雅、可扩展
+### 新一代AI驱动服务器监控面板 — 强大、优雅、可扩展
 
-[![版本](https://img.shields.io/badge/版本-v3.0.0-blue?style=for-the-badge)](https://github.com/nezha-dash/pro/releases)
-[![许可证](https://img.shields.io/badge/许可证-MIT-green?style=for-the-badge)](./LICENSE)
-[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.x-06B6D4?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
-[![Docker](https://img.shields.io/badge/Docker-支持-2496ED?style=for-the-badge&logo=docker)](https://www.docker.com/)
-[![Stars](https://img.shields.io/github/stars/nezha-dash/pro?style=for-the-badge&logo=github)](https://github.com/nezha-dash/pro)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/clowlove/nezha-dash-pro)
+[![License](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org)
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript)](https://typescriptlang.org)
+[![Tailwind](https://img.shields.io/badge/Tailwind-4.3-06B6D4?logo=tailwindcss)](https://tailwindcss.com)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://docker.com)
 
-**NezhaDash Pro** 是一款基于现代技术栈构建的高性能服务器监控面板，兼容 **哪吒监控**、**Komari** 和 **MyNodeQuery** 等主流数据源。提供实时数据可视化、告警通知、多节点管理等专业功能，适用于个人开发者与企业级运维场景。
-
-[📖 文档](https://nezha-dash.pro/docs) · [🐛 提交 Issue](https://github.com/nezha-dash/pro/issues) · [💬 加入社区](https://t.me/nezha_dash) · [🔄 更新日志](https://github.com/nezha-dash/pro/releases)
-
----
-
-![演示截图](https://via.placeholder.com/1200x700/1a1a2e/00d4ff?text=NezhaDash+Pro+%E6%BC%94%E7%A4%BA+%F0%9F%92%BB)
+基于 [nezha-dash](https://github.com/hamster1963/nezha-dash) 深度优化的 **Pro 版本**，新增 **22个功能模块**、**38,000+ 行代码**、**100+ 项优化**。
 
 </div>
 
 ---
 
-## 📑 目录
+## 📋 目录
 
-- [✨ 功能特性](#-功能特性)
-- [🆚 功能对比](#-功能对比开源版-vs-专业版)
-- [📸 界面截图](#-界面截图)
+- [✨ 核心功能](#-核心功能)
+- [🏗️ 技术架构](#️-技术架构)
+- [📊 优化清单](#-优化清单)
 - [🚀 快速开始](#-快速开始)
-- [⚙️ 配置参考](#️-配置参考)
-- [🔌 支持的数据源](#-支持的数据源)
-- [🛠️ 技术栈](#️-技术栈)
-- [📂 项目结构](#-项目结构)
-- [🤝 参与贡献](#-参与贡献)
+- [⚙️ 环境变量](#️-环境变量)
+- [📖 API文档](#-api文档)
+- [🔌 插件开发](#-插件开发)
+- [💰 商业化](#-商业化)
+- [🤝 贡献](#-贡献)
 - [📄 许可证](#-许可证)
-- [⭐ Star 历史](#-star-历史)
-- [🙏 致谢](#-致谢)
 
 ---
 
-## ✨ 功能特性
+## ✨ 核心功能
 
-| 功能 | 说明 |
-|:---|:---|
-| 📊 **实时监控** | CPU、内存、磁盘、网络流量实时图表，毫秒级刷新 |
-| 🌍 **全球节点地图** | 基于地理位置的节点分布可视化 |
-| 🔔 **智能告警** | 支持 Telegram、Discord、邮件、Webhook 等多种通知渠道 |
-| 🎨 **主题定制** | 内置多套主题，支持自定义 CSS 与品牌配色 |
-| 📱 **响应式设计** | 完美适配桌面端、平板和移动设备 |
-| 🔐 **安全认证** | 支持 OAuth2、TOTP 二步验证、API Token 鉴权 |
-| 📈 **历史数据** | 长期数据存储与趋势分析，支持自定义保留策略 |
-| 🌐 **多语言** | 内置中文、英文、日文等多语言支持 |
-| 🔌 **多数据源** | 同时接入哪吒监控、Komari、MyNodeQuery 等平台 |
-| ⚡ **极致性能** | 基于 SSR/ISR 的服务端渲染，首屏加载 < 1s |
-| 🧩 **插件系统** | 可扩展的插件架构，自定义数据展示和告警规则 |
-| 📤 **数据导出** | 支持导出 CSV、JSON、PNG 等格式的报告 |
+### 🔌 四种数据源支持
+
+| 数据源 | 状态 | 环境变量 |
+|--------|------|----------|
+| [哪吒监控](https://github.com/naiba/nezha) | ✅ 完整支持 | `NezhaBaseUrl` + `NezhaAuth` |
+| [Komari](https://github.com/komari-app/komari) | ✅ 完整支持 | `NEXT_PUBLIC_Komari=true` |
+| [MyNodeQuery](https://github.com/mhqs/mynodequery) | ✅ 完整支持 | `NEXT_PUBLIC_MyNodeQuery=true` |
+| [Uptime Kuma](https://github.com/louislam/uptime-kuma) | ✅ 完整支持 | `NEXT_PUBLIC_UptimeKuma=true` |
+
+### 🆕 Pro 版新增功能
+
+#### 🚨 AI智能告警系统
+- 阈值检测（CPU/内存/磁盘/丢包/离线）
+- 5条默认规则 + 自定义规则CRUD
+- AI智能诊断（调用LLM分析异常原因）
+- 持续时间+冷却期机制
+- O(1)告警索引查找
+
+#### 📱 多渠道通知
+- **Telegram Bot** — HTML格式化消息
+- **Discord Webhook** — Embed富文本
+- **通用Webhook** — HMAC-SHA256签名
+- 15秒超时保护
+- 3次指数退避重试
+
+#### 📊 历史数据持久化
+- SQLite WAL模式存储
+- 渐进式聚合（5s→1min→5min→30min→2h→1d）
+- 10张表 + 18个索引
+- 写透缓存（内存L1 + SQLite L2）
+- 24h/7d/30d/90d时间范围查询
+
+#### 🎨 主题系统
+- 10个预设主题（Dark Pro/Cyberpunk/Ocean/Forest/Sunset/Minimal/Corporate/Dracula/Nord/Tokyo Night）
+- 自定义颜色编辑器（19个颜色字段）
+- CSS变量引擎 + localStorage持久化
+- 主题导出/导入JSON
+
+#### 🔐 2FA双因素认证
+- TOTP实现（RFC 4648 Base32 + RFC 4226 HOTP）
+- AES-256-GCM加密存储密钥
+- QR码扫描 + 恢复码
+- 常量时间比较（防时序攻击）
+
+#### 🚀 一键批量部署
+- SSH连接池（并行+并发控制）
+- 密码/密钥两种认证
+- 一键安装Nezha Agent
+- 实时进度条 + 失败重试
+- 部署面板UI
+
+#### 💰 流量/成本统计
+- 流量快照记录（每小时）
+- 多币种支持（USD/CNY/EUR）
+- 月度成本估算 + 突增检测
+- 月度报告生成 + CSV导出
+- 流量图表（24h/7d/30d/90d）
+
+#### 👥 用户系统 + 多租户
+- RBAC权限模型（4角色12权限）
+- 密码哈希（PBKDF2-SHA512，100k轮次）
+- 团队管理 + 邀请链接
+- 3级套餐（Free/Pro/Team/Enterprise）
+- 配额强制执行
+
+#### 📱 移动端PWA优化
+- 底部Tab导航（5个标签）
+- 触摸友好服务器卡片（滑动/展开）
+- 下拉刷新组件
+- 底部Sheet弹窗
+- 44px最小触摸目标
+- Safe Area适配（刘海屏）
+
+#### 📈 高级图表系统
+- **MetricChart** — 通用面积/折线/柱状图
+- **ComparisonChart** — 多服务器对比
+- **HeatmapChart** — 365天活跃度热力图
+- **GaugeChart** — 动画环形仪表盘
+- **NetworkTopology** — SVG网络拓扑图
+- **ExportButton** — PNG/SVG/CSV导出
+
+#### 🔌 插件系统
+- 沙箱执行（new Function隔离）
+- 4种Hook（onServerData/onAlert/onNotification/onDeploy）
+- 5种权限（read:servers/read:alerts/write:notifications等）
+- 热重载支持
+- 示例健康检查插件
+
+#### 🪝 Webhook系统
+- 5种事件类型（server.online/offline/alert.triggered/resolved/deploy.completed）
+- HMAC-SHA256签名验证
+- 3次指数退避重试（1s/5s/15s）
+- 交付日志记录
+
+#### 📦 JavaScript SDK
+- 零依赖TypeScript客户端
+- 完整类型安全
+- 可配置重试/超时
+- CJS/ESM双构建
+- 完整文档 + 示例
+
+#### 💰 SaaS计费平台
+- 4级套餐（Free 3台/Pro 20台/Team 100台/Enterprise无限）
+- 订阅生命周期（试用→活跃→逾期→取消）
+- 按比例计算（升级/降级）
+- 优惠券系统（百分比/固定金额）
+- 功能门控（11个功能×4级套餐）
+- 定价页面 + 用量仪表盘
 
 ---
 
-## 🆚 功能对比（开源版 vs 专业版）
+## 🏗️ 技术架构
 
-| 功能模块 | 🆓 开源版 | 💎 专业版 |
-|:---|:---:|:---:|
-| 实时监控面板 | ✅ | ✅ |
-| 基础图表展示 | ✅ | ✅ |
-| 单数据源接入 | ✅ | ✅ |
-| 深色/浅色主题 | ✅ | ✅ |
-| 多数据源同时接入 | ❌ | ✅ |
-| 全球节点地图 | ❌ | ✅ |
-| 智能告警与通知 | ❌ | ✅ |
-| 历史数据趋势分析 | ❌ | ✅ |
-| 自定义主题/品牌 | ❌ | ✅ |
-| 插件系统 | ❌ | ✅ |
-| 数据导出与报告 | ❌ | ✅ |
-| OAuth2 / TOTP 认证 | ❌ | ✅ |
-| API Token 管理 | ❌ | ✅ |
-| 优先技术支持 | ❌ | ✅ |
-| 白标定制 | ❌ | ✅ |
-
-> 💡 **提示**：开源版已能满足个人用户的基础监控需求，专业版则面向需要高级功能和企业级支持的用户。
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        用户浏览器                             │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │ SWR轮询   │  │ React 19 │  │ PWA      │  │ 主题引擎  │   │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘   │
+├───────┴──────────────┴────────────┴──────────────┴──────────┤
+│                    Next.js 16 App Router                     │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────────┐  │
+│  │ Server Comp  │  │ Client Comp  │  │ Context Providers│  │
+│  │ (RSC)        │  │ (交互)       │  │ (4层嵌套)        │  │
+│  └──────┬───────┘  └──────┬───────┘  └────────┬─────────┘  │
+├─────────┴──────────────────┴───────────────────┴────────────┤
+│                    功能模块层                                 │
+│  ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ │
+│  │告警 │ │通知 │ │存储 │ │部署 │ │计费 │ │用户 │ │插件 │ │
+│  └──┬──┘ └──┬──┘ └──┬──┘ └──┬──┘ └──┬──┘ └──┬──┘ └──┬──┘ │
+├─────┴────────┴───────┴───────┴───────┴───────┴───────┴──────┤
+│                    数据源驱动层                               │
+│  ┌──────┐  ┌──────┐  ┌──────────┐  ┌───────────┐          │
+│  │ Nezha│  │Komari│  │MyNodeQry │  │UptimeKuma│           │
+│  └──┬───┘  └──┬───┘  └────┬─────┘  └─────┬────┘           │
+├─────┴──────────┴───────────┴───────────────┴────────────────┤
+│                    存储层                                     │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐                  │
+│  │  SQLite   │  │ 内存L1   │  │ localStorage│              │
+│  │  (持久化) │  │ (缓存)   │  │ (主题/偏好) │              │
+│  └──────────┘  └──────────┘  └──────────┘                  │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## 📸 界面截图
+## 📊 优化清单
 
-<div align="center">
+### 🔒 安全优化（7项）
 
-### 🖥️ 仪表盘总览
+| # | 优化 | 文件 | 说明 |
+|---|------|------|------|
+| 1 | 移除eval() | `lib/plugins/loader.ts` | → new Function()沙箱 |
+| 2 | SSH密码保护 | `lib/deploy/ssh-manager.ts` | → 环境变量传递 |
+| 3 | SSH主机密钥 | `lib/deploy/ssh-manager.ts` | → accept-new |
+| 4 | 2FA加密密钥 | `lib/auth/2fa-setup.ts` | → 必须配置环境变量 |
+| 5 | 密码时序攻击 | `lib/users/user-manager.ts` | → timingSafeEqual |
+| 6 | Webhook SSRF | `lib/webhooks/webhook-manager.ts` | → 私有IP验证 |
+| 7 | base64编码 | `lib/users/user-manager.ts` | → base64url |
 
-![仪表盘](https://via.placeholder.com/1200x650/0f0f23/00d4ff?text=Dashboard+Overview+%F0%9F%96%A5%EF%B8%8F)
+### ⚡ 性能优化（13项）
 
-### 📊 实时监控图表
+| # | 优化 | 文件 | 影响 |
+|---|------|------|------|
+| 1 | React.memo | ServerCard.tsx | 防止列表重渲染 |
+| 2 | React.memo | ServerCardInline.tsx | 防止列表重渲染 |
+| 3 | 5个useMemo | ServerListClient.tsx | 排序/筛选缓存 |
+| 4 | useMemo GeoJSON | Global.tsx | JSON解析缓存 |
+| 5 | useMemo国家统计 | Global.tsx | 统计缓存 |
+| 6 | useMemo D3投影 | InteractiveMap.tsx | 地图投影缓存 |
+| 7 | useMemo国家索引 | InteractiveMap.tsx | hover O(1)查找 |
+| 8 | 修复数组变异 | DashCommand.tsx | 不污染Context |
+| 9 | useMemo排序 | DashCommand.tsx | 排序缓存 |
+| 10 | 7个useMemo | ServerDetailChartClient.tsx | 图表数据缓存 |
+| 11 | 命名导入 | chart.tsx | Tree-shaking |
+| 12 | O(1)告警索引 | alert-manager.ts | Map索引查找 |
+| 13 | Math.max修复 | 3个文件 | 防止栈溢出 |
 
-![监控图表](https://via.placeholder.com/1200x650/0f0f23/00ff88?text=Real-time+Charts+%F0%9F%93%88)
+### 🏗️ 架构优化（8项）
 
-### 🌍 全球节点地图
+| # | 优化 | 文件 | 说明 |
+|---|------|------|------|
+| 1 | SQLite持久化 | `lib/shared/database.ts` | WAL模式单例 |
+| 2 | 数据库迁移 | `lib/shared/migrations.ts` | 10表18索引 |
+| 3 | 写透缓存 | users/alerts/webhooks/notifications | 内存L1+SQLite L2 |
+| 4 | 类型统一 | `lib/shared/types.ts` | 单一真相源 |
+| 5 | serverId统一 | 4个模块 | 全部number类型 |
+| 6 | ID生成统一 | 2个模块 | crypto.randomUUID() |
+| 7 | fetch超时 | 3个通知器 | 15秒AbortController |
+| 8 | 错误处理 | 4个API路由 | try-catch包装 |
 
-![节点地图](https://via.placeholder.com/1200x650/0f0f23/ff6b6b?text=Global+Node+Map+%F0%9F%8C%8D)
+### 🛡️ 安全加固（4项）
 
-### 🔔 告警管理
+| # | 优化 | 文件 | 说明 |
+|---|------|------|------|
+| 1 | poweredByHeader | next.config.mjs | 移除X-Powered-By |
+| 2 | 非root用户 | Dockerfile | nextjs用户运行 |
+| 3 | 健康检查 | Dockerfile | 30秒间隔 |
+| 4 | OG元数据 | layout.tsx | 社交分享优化 |
 
-![告警管理](https://via.placeholder.com/1200x650/0f0f23/ffd93d?text=Alert+Management+%F0%9F%94%94)
+### 📦 依赖优化（3项）
 
-</div>
+| # | 优化 | 文件 | 说明 |
+|---|------|------|------|
+| 1 | Node 22 LTS | Dockerfile | 替换Node 25 |
+| 2 | AVIF/WebP | next.config.mjs | 现代图片格式 |
+| 3 | docker-compose | docker/ | 健康检查+数据卷 |
 
 ---
 
 ## 🚀 快速开始
 
-### 📋 环境要求
-
-| 依赖 | 最低版本 | 推荐版本 |
-|:---|:---:|:---:|
-| Node.js | 20.x | 22.x LTS |
-| pnpm | 9.x | 10.x |
-| Docker（可选） | 24.x | 26.x |
-
----
-
-### 🐳 方式一：Docker 部署（推荐）
-
-最简单的部署方式，适合生产环境：
-
-```bash
-# 拉取镜像
-docker pull nezha-dash/pro:latest
-
-# 运行容器
-docker run -d \
-  --name nezha-dash-pro \
-  -p 3000:3000 \
-  -v $(pwd)/config:/app/config \
-  -v $(pwd)/data:/app/data \
-  -e DATABASE_URL="file:./data/prod.db" \
-  -e NEXTAUTH_SECRET="your-secret-key" \
-  nezha-dash/pro:latest
-```
-
-**使用 Docker Compose：**
-
-```yaml
-# docker-compose.yml
-version: "3.9"
-
-services:
-  nezha-dash:
-    image: nezha-dash/pro:latest
-    container_name: nezha-dash-pro
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./config:/app/config
-      - ./data:/app/data
-    environment:
-      - DATABASE_URL=file:./data/prod.db
-      - NEXTAUTH_SECRET=your-secret-key-here
-      - TZ=Asia/Shanghai
-```
-
-```bash
-docker compose up -d
-```
-
-> 🌐 访问 `http://your-server-ip:3000` 即可打开面板。
-
----
-
-### ▲ 方式二：Vercel 一键部署
-
-适合快速体验，零运维成本：
-
-1. **Fork** 本仓库到你的 GitHub 账号
-2. 登录 [Vercel](https://vercel.com) 并导入项目
-3. 配置以下环境变量：
-
-| 变量名 | 说明 | 示例值 |
-|:---|:---|:---|
-| `DATABASE_URL` | 数据库连接地址 | `file:./data/prod.db` |
-| `NEXTAUTH_SECRET` | 认证密钥 | `openssl rand -base64 32` |
-| `NEXTAUTH_URL` | 站点地址 | `https://your-domain.vercel.app` |
-
-4. 点击 **Deploy**，等待部署完成
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/nezha-dash/pro)
-
----
-
-### 🔧 方式三：手动部署
-
-适合开发者或需要深度定制的场景：
+### Docker 部署（推荐）
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/nezha-dash/pro.git
-cd pro
+git clone https://github.com/clowlove/nezha-dash-pro.git
+cd nezha-dash-pro/docker
+
+# 2. 配置环境变量
+cp .env.example .env
+# 编辑 .env 文件，填入你的配置
+
+# 3. 启动
+docker compose up -d
+
+# 4. 访问
+open http://localhost:4123
+```
+
+### Vercel 部署
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/clowlove/nezha-dash-pro)
+
+### 手动部署
+
+```bash
+# 1. 克隆
+git clone https://github.com/clowlove/nezha-dash-pro.git
+cd nezha-dash-pro
 
 # 2. 安装依赖
 pnpm install
 
-# 3. 初始化数据库
-pnpm db:push
-
-# 4. 复制并编辑配置文件
+# 3. 配置
 cp .env.example .env
-# 编辑 .env 填入你的配置
+# 编辑 .env
 
-# 5. 构建生产版本
+# 4. 构建
 pnpm build
 
-# 6. 启动服务
+# 5. 启动
 pnpm start
 ```
 
-**开发模式：**
+---
+
+## ⚙️ 环境变量
+
+### 核心配置
+
+| 变量 | 必需 | 说明 | 示例 |
+|------|------|------|------|
+| `NezhaBaseUrl` | ✅ | 哪吒面板地址 | `http://1.2.3.4:8008` |
+| `NezhaAuth` | ✅ | API Token | `your-token` |
+| `SITE_PASSWORD` | ❌ | 登录密码 | `your-password` |
+| `DefaultLocale` | ❌ | 默认语言 | `zh` / `en` / `ja` |
+
+### 告警配置
+
+| 变量 | 说明 | 示例 |
+|------|------|------|
+| `AI_DIAGNOSIS_API_KEY` | AI诊断API Key | `sk-xxx` |
+| `AI_DIAGNOSIS_BASE_URL` | API地址 | `https://api.openai.com/v1` |
+| `AI_DIAGNOSIS_MODEL` | 模型名 | `gpt-4o` |
+
+### 通知配置
+
+| 变量 | 说明 | 示例 |
+|------|------|------|
+| `TELEGRAM_BOT_TOKEN` | Telegram Bot Token | `123:ABC` |
+| `TELEGRAM_CHAT_ID` | Chat ID | `-100123` |
+| `DISCORD_WEBHOOK_URL` | Discord Webhook | `https://discord.com/...` |
+
+### 存储配置
+
+| 变量 | 说明 | 默认值 |
+|------|------|--------|
+| `STORAGE_PATH` | SQLite路径 | `./data/nezha.db` |
+| `METRICS_RETENTION_DAYS` | 数据保留天数 | `90` |
+
+### 安全配置
+
+| 变量 | 说明 | 示例 |
+|------|------|------|
+| `TWO_FACTOR_ENCRYPTION_KEY` | 2FA加密密钥 | 32位随机字符串 |
+| `TWO_FACTOR_ISSUER` | 2FA发行者 | `NezhaDashPro` |
+
+---
+
+## 📖 API文档
+
+完整API文档见 [docs/API.md](docs/API.md)
+
+### 核心端点
+
+| 端点 | 方法 | 说明 |
+|------|------|------|
+| `/api/server` | GET | 服务器列表 |
+| `/api/detail` | GET | 服务器详情 |
+| `/api/monitor` | GET | 监控数据 |
+| `/api/alerts` | GET/POST | 告警管理 |
+| `/api/notifications` | GET/POST | 通知管理 |
+| `/api/history` | GET | 历史数据 |
+| `/api/deploy` | POST | 批量部署 |
+| `/api/billing` | GET | 流量/成本 |
+| `/api/users` | GET/POST | 用户管理 |
+| `/api/themes` | GET/POST | 主题管理 |
+| `/api/plugins` | GET/POST | 插件管理 |
+| `/api/webhooks` | GET/POST | Webhook管理 |
+| `/api/saas/plans` | GET | 套餐查询 |
+| `/api/v1/*` | * | 版本化API |
+
+### SDK使用
+
+```typescript
+import { createClient } from '@nezha-dash-pro/sdk'
+
+const client = createClient({
+  baseUrl: 'https://your-dashboard.com',
+  apiKey: 'your-api-key',
+})
+
+// 获取服务器列表
+const servers = await client.getServers()
+
+// 获取告警
+const alerts = await client.getAlerts({ status: 'active' })
+
+// 创建Webhook
+await client.createWebhook({
+  url: 'https://your-handler.com/webhook',
+  events: ['server.offline', 'alert.triggered'],
+})
+```
+
+---
+
+## 🔌 插件开发
+
+```typescript
+// plugins/my-plugin/manifest.json
+{
+  "name": "my-plugin",
+  "version": "1.0.0",
+  "description": "My custom plugin",
+  "hooks": ["onServerData", "onAlert"],
+  "permissions": ["read:servers", "read:alerts"]
+}
+
+// plugins/my-plugin/index.ts
+export function onServerData(ctx, servers) {
+  for (const server of servers) {
+    if (server.cpu > 90) {
+      console.warn(`High CPU: ${server.name}`)
+    }
+  }
+}
+
+export function onAlert(ctx, alert) {
+  ctx.notifications.send({
+    title: `Alert: ${alert.serverName}`,
+    body: alert.message,
+    severity: alert.severity,
+  })
+}
+```
+
+---
+
+## 💰 商业化
+
+### 定价方案
+
+| 套餐 | 价格 | 服务器数 | 功能 |
+|------|------|----------|------|
+| **免费版** | ¥0/月 | 3台 | 基础监控 |
+| **Pro版** | ¥29/月 | 20台 | +告警+通知+历史 |
+| **团队版** | ¥99/月 | 100台 | +协作+API |
+| **企业版** | ¥299/月 | 无限 | +多租户+SSO |
+
+### 自部署Pro版
+
+| 套餐 | 价格 | 功能 |
+|------|------|------|
+| **开源版** | ¥0 | 基础监控+3种数据源 |
+| **Pro版** | ¥299永久 | 全部功能 |
+| **Enterprise** | ¥999永久 | +定制开发+优先支持 |
+
+---
+
+## 🤝 贡献
+
+欢迎贡献！请阅读 [贡献指南](docs/CONTRIBUTING.md)。
 
 ```bash
-# 启动开发服务器（支持热更新）
+# 1. Fork & Clone
+git clone https://github.com/your-username/nezha-dash-pro.git
+
+# 2. 创建分支
+git checkout -b feature/my-feature
+
+# 3. 开发 & 测试
 pnpm dev
+pnpm check
+
+# 4. 提交
+git commit -m "feat: add my feature"
+
+# 5. 推送 & PR
+git push origin feature/my-feature
 ```
-
----
-
-## ⚙️ 配置参考
-
-### 环境变量
-
-| 变量名 | 必填 | 默认值 | 说明 |
-|:---|:---:|:---|:---|
-| `DATABASE_URL` | ✅ | `file:./data/prod.db` | 数据库连接字符串（SQLite / PostgreSQL） |
-| `NEXTAUTH_SECRET` | ✅ | — | NextAuth.js 加密密钥，建议 32+ 字符 |
-| `NEXTAUTH_URL` | ✅ | `http://localhost:3000` | 应用公开访问地址 |
-| `PORT` | ❌ | `3000` | 服务监听端口 |
-| `TZ` | ❌ | `Asia/Shanghai` | 时区设置 |
-| `LOG_LEVEL` | ❌ | `info` | 日志级别：`debug` / `info` / `warn` / `error` |
-| `THEME` | ❌ | `dark` | 默认主题：`dark` / `light` / `auto` |
-| `TELEGRAM_BOT_TOKEN` | ❌ | — | Telegram 机器人 Token（告警用） |
-| `TELEGRAM_CHAT_ID` | ❌ | — | Telegram 通知群组 ID |
-| `DISCORD_WEBHOOK_URL` | ❌ | — | Discord Webhook 地址 |
-| `SMTP_HOST` | ❌ | — | 邮件服务器地址 |
-| `SMTP_PORT` | ❌ | `587` | 邮件服务器端口 |
-| `SMTP_USER` | ❌ | — | 邮件账号 |
-| `SMTP_PASS` | ❌ | — | 邮件密码 |
-| `OAUTH_CLIENT_ID` | ❌ | — | OAuth2 客户端 ID |
-| `OAUTH_CLIENT_SECRET` | ❌ | — | OAuth2 客户端密钥 |
-| `OAUTH_ISSUER` | ❌ | — | OAuth2 Issuer URL |
-| `MAX_NODES` | ❌ | `500` | 最大节点数限制 |
-| `DATA_RETENTION_DAYS` | ❌ | `30` | 历史数据保留天数 |
-
-### 配置文件
-
-配置文件位于 `config/` 目录下：
-
-```yaml
-# config/app.yml
-app:
-  name: "我的监控面板"
-  description: "服务器状态监控"
-  logo: "/logo.png"
-  footer: "© 2026 My Dashboard"
-
-nodes:
-  refresh_interval: 5  # 数据刷新间隔（秒）
-  timeout: 10          # 节点超时时间（秒）
-
-alerts:
-  enabled: true
-  channels:
-    - type: telegram
-      enabled: true
-    - type: discord
-      enabled: false
-    - type: email
-      enabled: false
-```
-
----
-
-## 🔌 支持的数据源
-
-NezhaDash Pro 兼容多种主流服务器监控数据源，支持同时接入多个平台：
-
-### 🟢 哪吒监控（Nezha）
-
-| 项目 | 说明 |
-|:---|:---|
-| 官网 | [https://nezha.wiki](https://nezha.wiki) |
-| 接入方式 | API v2 / gRPC |
-| 支持功能 | 节点状态、流量统计、告警规则 |
-| 最低版本 | v1.x |
-
-```yaml
-# 数据源配置示例
-sources:
-  - name: "nezhahq"
-    type: nezha
-    endpoint: "https://your-nezha.example.com"
-    token: "your-api-token"
-```
-
-### 🔵 Komari
-
-| 项目 | 说明 |
-|:---|:---|
-| 官网 | [https://komari.moe](https://komari.moe) |
-| 接入方式 | REST API |
-| 支持功能 | 节点监控、性能统计、自定义面板 |
-| 最低版本 | v0.5+ |
-
-```yaml
-sources:
-  - name: "komari"
-    type: komari
-    endpoint: "https://your-komari.example.com"
-    token: "your-api-token"
-```
-
-### 🟣 MyNodeQuery
-
-| 项目 | 说明 |
-|:---|:---|
-| 官网 | [https://mynodequery.com](https://mynodequery.com) |
-| 接入方式 | REST API |
-| 支持功能 | 节点状态查询、位置信息、网络测试 |
-| 最低版本 | v2.0+ |
-
-```yaml
-sources:
-  - name: "mynodequery"
-    type: mynodequery
-    endpoint: "https://api.mynodequery.com"
-    token: "your-api-key"
-```
-
-> 💡 **提示**：你可以同时配置多个数据源，面板会自动聚合所有节点数据进行统一展示。
-
----
-
-## 🛠️ 技术栈
-
-<div align="center">
-
-| 层级 | 技术 | 说明 |
-|:---|:---|:---|
-| 🎯 **框架** | [Next.js 16](https://nextjs.org/) | React 全栈框架，App Router + RSC |
-| ⚛️ **UI 库** | [React 19](https://react.dev/) | 用户界面构建，支持 Server Components |
-| 🔷 **语言** | [TypeScript 5.x](https://www.typescriptlang.org/) | 类型安全，提升开发体验 |
-| 🎨 **样式** | [Tailwind CSS 4.x](https://tailwindcss.com/) | 原子化 CSS，快速构建 UI |
-| 🧱 **组件** | [shadcn/ui](https://ui.shadcn.com/) | 可复用组件库，基于 Radix UI |
-| 📊 **图表** | [Recharts](https://recharts.org/) | 基于 D3 的 React 图表库 |
-| 🗄️ **数据库** | [Drizzle ORM](https://orm.drizzle.team/) | TypeScript ORM，支持 SQLite / PostgreSQL |
-| 🔐 **认证** | [NextAuth.js](https://next-auth.js.org/) | 身份认证与授权 |
-| 🐳 **容器** | [Docker](https://www.docker.com/) | 容器化部署 |
-| ▲ **部署** | [Vercel](https://vercel.com) | 一键部署，边缘网络加速 |
-
-</div>
-
----
-
-## 📂 项目结构
-
-```
-nezha-dash-pro/
-├── 📁 app/                    # Next.js App Router
-│   ├── 📁 (auth)/             # 认证相关页面
-│   ├── 📁 (dashboard)/        # 仪表盘页面
-│   ├── 📁 api/                # API 路由
-│   └── 📄 layout.tsx          # 根布局
-├── 📁 components/             # React 组件
-│   ├── 📁 ui/                 # 基础 UI 组件
-│   ├── 📁 charts/             # 图表组件
-│   └── 📁 dashboard/          # 仪表盘组件
-├── 📁 config/                 # 配置文件
-├── 📁 lib/                    # 工具函数
-│   ├── 📁 db/                 # 数据库相关
-│   ├── 📁 sources/            # 数据源适配器
-│   └── 📁 utils/              # 通用工具
-├── 📁 public/                 # 静态资源
-├── 📁 styles/                 # 全局样式
-├── 📄 docker-compose.yml      # Docker 编排
-├── 📄 Dockerfile              # Docker 构建文件
-├── 📄 drizzle.config.ts       # Drizzle ORM 配置
-├── 📄 next.config.ts          # Next.js 配置
-├── 📄 tailwind.config.ts      # Tailwind 配置
-└── 📄 package.json            # 项目依赖
-```
-
----
-
-## 🤝 参与贡献
-
-我们欢迎所有形式的贡献！无论是 Bug 修复、功能开发、文档改进还是问题反馈。
-
-### 🐛 提交 Bug
-
-1. 前往 [Issues](https://github.com/nezha-dash/pro/issues) 页面
-2. 使用 **Bug Report** 模板创建新 Issue
-3. 提供详细的复现步骤和环境信息
-
-### 💡 提出新功能
-
-1. 前往 [Discussions](https://github.com/nezha-dash/pro/discussions) 发起讨论
-2. 说明使用场景和预期效果
-3. 获得社区认可后提交 PR
-
-### 🔧 提交代码
-
-```bash
-# 1. Fork 并克隆仓库
-git clone https://github.com/YOUR_USERNAME/pro.git
-cd pro
-
-# 2. 创建功能分支
-git checkout -b feature/amazing-feature
-
-# 3. 进行开发并确保通过检查
-pnpm lint        # 代码规范检查
-pnpm typecheck   # 类型检查
-pnpm test        # 运行测试
-
-# 4. 提交代码
-git commit -m "feat: add amazing feature"
-
-# 5. 推送并创建 PR
-git push origin feature/amazing-feature
-```
-
-### 📝 Commit 规范
-
-请遵循 [Conventional Commits](https://www.conventionalcommits.org/) 规范：
-
-| 类型 | 说明 | 示例 |
-|:---|:---|:---|
-| `feat` | 新功能 | `feat: 添加节点地图功能` |
-| `fix` | 修复 Bug | `fix: 修复内存泄漏问题` |
-| `docs` | 文档更新 | `docs: 更新部署指南` |
-| `style` | 代码格式 | `style: 格式化代码风格` |
-| `refactor` | 重构 | `refactor: 优化数据源适配器` |
-| `perf` | 性能优化 | `perf: 优化图表渲染性能` |
-| `test` | 测试 | `test: 添加单元测试` |
-| `chore` | 构建/工具 | `chore: 升级依赖版本` |
 
 ---
 
 ## 📄 许可证
 
-本项目基于 **[MIT License](./LICENSE)** 开源发布。
+本项目基于 [Apache License 2.0](LICENSE) 开源。
 
-```
-MIT License
-
-Copyright (c) 2024-2026 NezhaDash
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-```
-
-> ⚠️ **注意**：MIT 许可证适用于开源版本。专业版（Pro）的功能模块受独立的商业许可协议约束，详见 [LICENSE-PRO](./LICENSE-PRO)。
-
----
-
-## ⭐ Star 历史
-
-<div align="center">
-
-[![Star History Chart](https://api.star-history.com/svg?repos=nezha-dash/pro&type=Date)](https://star-history.com/#nezha-dash/pro&Date)
-
-> 🌟 如果觉得项目有帮助，请给我们一个 Star！你的支持是我们持续更新的动力。
-
-</div>
+Pro版商业功能需购买商业许可证。详见 [定价方案](#-商业化)。
 
 ---
 
 ## 🙏 致谢
 
-感谢以下开源项目和社区的支持：
-
-- [哪吒监控](https://nezha.wiki) — 优秀的服务器监控方案
-- [Komari](https://komari.moe) — 轻量级节点监控平台
-- [Next.js](https://nextjs.org/) — React 全栈框架
+- [nezha-dash](https://github.com/hamster1963/nezha-dash) — 原始项目
+- [哪吒监控](https://github.com/naiba/nezha) — 监控后端
+- [Next.js](https://nextjs.org) — React框架
 - [Vercel](https://vercel.com) — 部署平台
-- [shadcn/ui](https://ui.shadcn.com/) — UI 组件库
-- [Drizzle ORM](https://orm.drizzle.team/) — TypeScript ORM
+- [shadcn/ui](https://ui.shadcn.com) — UI组件库
 
 ---
 
 <div align="center">
 
-**由 ❤️ 和 ☕ 驱动开发**
+**⭐ 如果这个项目对你有帮助，请给个Star支持一下！⭐**
 
-[⬆ 回到顶部](#-nezhadash-pro)
+[![Star History Chart](https://api.star-history.com/svg?repos=clowlove/nezha-dash-pro&type=Date)](https://star-history.com/#clowlove/nezha-dash-pro&Date)
 
 </div>
