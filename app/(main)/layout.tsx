@@ -1,6 +1,8 @@
 import type React from "react"
 import Footer from "@/app/(main)/footer"
 import Header from "@/app/(main)/header"
+import { MobileNav } from "@/components/mobile/MobileNav"
+import "@/styles/mobile.css"
 import { CommandProvider } from "@/app/context/command-context"
 import { FilterProvider } from "@/app/context/network-filter-context"
 import { ServerDataProvider } from "@/app/context/server-data-context"
@@ -32,6 +34,7 @@ export default function MainLayout({ children }: DashboardProps) {
           </FilterProvider>
         </CommandProvider>
       </main>
+      <MobileNav />
     </div>
   )
 }

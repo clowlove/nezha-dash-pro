@@ -1,7 +1,45 @@
 {
-  "name": "NezhaDash PWA App",
+  "name": "NezhaDash Pro",
   "short_name": "NezhaDash",
+  "description": "Modern server monitoring dashboard with real-time metrics, alerts, and network insights.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#18181b",
+  "background_color": "#fafafa",
+  "categories": ["utilities", "monitoring"],
   "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/android-chrome-192x192.png",
       "sizes": "192x192",
@@ -11,12 +49,64 @@
     {
       "src": "/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "theme_color": "hsl(0 0% 98%)",
-  "background_color": "hsl(0 0% 98%)",
-  "start_url": "/",
-  "display": "standalone",
-  "orientation": "portrait"
+  "shortcuts": [
+    {
+      "name": "Servers",
+      "short_name": "Servers",
+      "description": "View all monitored servers",
+      "url": "/servers",
+      "icons": [
+        {
+          "src": "/icons/shortcut-servers.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Alerts",
+      "short_name": "Alerts",
+      "description": "View active alerts and notifications",
+      "url": "/alerts",
+      "icons": [
+        {
+          "src": "/icons/shortcut-alerts.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Network",
+      "short_name": "Network",
+      "description": "Network traffic and monitoring",
+      "url": "/network",
+      "icons": [
+        {
+          "src": "/icons/shortcut-network.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "short_name": "Settings",
+      "description": "Dashboard configuration",
+      "url": "/settings",
+      "icons": [
+        {
+          "src": "/icons/shortcut-settings.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
 }

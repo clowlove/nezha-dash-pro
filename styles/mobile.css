@@ -1,0 +1,421 @@
+/*
+ * Mobile-specific styles for NezhaDash Pro PWA.
+ * All mobile-only rules live here so they can be conditionally imported
+ * or tree-shaken. Desktop browsers pay no download cost thanks to the
+ * media query wrapper.
+ *
+ * Primary breakpoint: 768px (iPad portrait and below).
+ * Touch-target minimum: 44×44 px per WCAG / Apple HIG.
+ */
+
+/* ============================================================
+   1. Bottom Navigation Bar
+   ============================================================ */
+
+.mobile-nav {
+  display: none; /* hidden on desktop */
+}
+
+@media (max-width: 768px) {
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background-color: hsl(var(--card));
+    border-top: 1px solid hsl(var(--border));
+    /* Respect iOS safe area */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+
+  .mobile-nav__inner {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
+    height: 56px;
+  }
+
+  .mobile-nav__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    flex: 1;
+    min-height: 44px;          /* touch target */
+    min-width: 44px;
+    text-decoration: none;
+    color: hsl(var(--muted-foreground));
+    font-size: 10px;
+    line-height: 1;
+    transition: color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .mobile-nav__item--active {
+    color: hsl(var(--primary));
+  }
+
+  .mobile-nav__icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-nav__badge {
+    position: absolute;
+    top: -4px;
+    right: -8px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 9999px;
+    background-color: hsl(var(--destructive));
+    color: hsl(var(--destructive-foreground));
+    font-size: 9px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .mobile-nav__label {
+    font-weight: 500;
+  }
+
+  /* Add bottom padding to main content so it doesn't hide behind nav */
+  body {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* ============================================================
+   2. Mobile Server Card
+   ============================================================ */
+
+.mobile-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid hsl(var(--border));
+  background-color: hsl(var(--card));
+  margin-bottom: 8px;
+}
+
+.mobile-card__swipe-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: hsl(var(--muted));
+}
+
+.mobile-card__content {
+  position: relative;
+  z-index: 1;
+  background-color: hsl(var(--card));
+  transition: transform 0.15s ease;
+}
+
+.mobile-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 14px;
+  min-height: 44px;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-card__header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.mobile-card__status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mobile-card__title-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mobile-card__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-card__host {
+  font-size: 11px;
+  color: hsl(var(--muted-foreground));
+}
+
+.mobile-card__header-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.mobile-card__uptime {
+  font-size: 11px;
+  color: hsl(var(--muted-foreground));
+}
+
+.mobile-card__chevron {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Stats grid */
+.mobile-card__stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 14px 12px;
+}
+
+.mobile-card__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12px;
+  color: hsl(var(--muted-foreground));
+}
+
+.mobile-card__stat-label {
+  font-weight: 500;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mobile-card__stat-value {
+  font-size: 12px;
+  color: hsl(var(--foreground));
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.mobile-card__usage-track {
+  height: 4px;
+  border-radius: 9999px;
+  background-color: hsl(var(--muted));
+  overflow: hidden;
+}
+
+.mobile-card__usage-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+/* Expanded details */
+.mobile-card__details {
+  padding: 12px 14px;
+  border-top: 1px solid hsl(var(--border));
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; max-height: 0; }
+  to   { opacity: 1; max-height: 500px; }
+}
+
+/* ============================================================
+   3. Pull-to-Refresh
+   ============================================================ */
+
+.ptr-container {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.ptr-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: hsl(var(--muted-foreground));
+}
+
+.ptr-spinner {
+  animation: spin 0.7s linear infinite;
+}
+
+.ptr-arrow {
+  transition: transform 0.15s ease;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   4. Mobile Alert Sheet (Bottom Sheet)
+   ============================================================ */
+
+.mobile-sheet__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0);
+  pointer-events: none;
+  transition: background 0.25s ease;
+}
+
+.mobile-sheet__backdrop--visible {
+  background: rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+}
+
+.mobile-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 70;
+  max-height: 85vh;
+  border-radius: 16px 16px 0 0;
+  background-color: hsl(var(--card));
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  overflow-y: auto;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.mobile-sheet--open {
+  transform: translateY(0);
+}
+
+.mobile-sheet__handle {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 4px;
+}
+
+.mobile-sheet__handle-bar {
+  width: 36px;
+  height: 4px;
+  border-radius: 9999px;
+  background-color: hsl(var(--muted-foreground) / 0.3);
+}
+
+.mobile-sheet__header {
+  display: flex;
+  align-items: flex-start;
+  padding: 8px 16px 12px;
+  gap: 12px;
+}
+
+.mobile-sheet__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  line-height: 1.3;
+}
+
+.mobile-sheet__badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.mobile-sheet__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 8px;
+  color: hsl(var(--muted-foreground));
+  transition: background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-sheet__close:hover {
+  background-color: hsl(var(--muted));
+}
+
+.mobile-sheet__body {
+  padding: 0 16px 24px;
+  font-size: 13px;
+  color: hsl(var(--foreground));
+  line-height: 1.6;
+}
+
+/* ============================================================
+   5. General Mobile Utilities
+   ============================================================ */
+
+@media (max-width: 768px) {
+  /* Hide horizontal scrollbar globally */
+  html, body {
+    overflow-x: hidden;
+  }
+
+  /* Ensure all interactive elements meet 44px touch target */
+  button, a, [role="button"], input, select, textarea {
+    min-height: 44px;
+  }
+
+  /* Safe-area left/right for notched devices */
+  body {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  /* Reduce font size slightly for compactness */
+  .mobile-card__name {
+    font-size: 13px;
+  }
+}
+
+/* Small phones */
+@media (max-width: 375px) {
+  .mobile-card__stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Tablet portrait */
+@media (min-width: 769px) {
+  .mobile-card,
+  .mobile-nav,
+  .mobile-sheet,
+  .mobile-sheet__backdrop {
+    /* Ensure mobile components are completely hidden on desktop */
+    display: none !important;
+  }
+}
