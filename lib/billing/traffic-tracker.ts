@@ -12,14 +12,13 @@ let alertIdCounter = 0;
 // SQLite integration hook — replace these to persist data
 const storageHook = {
   async saveRecord(record: TrafficRecord): Promise<void> {
-    // TODO: INSERT INTO traffic_records (...)
+    console.warn('[Billing] Storage not configured, traffic record will be lost on restart'),
   },
   async loadRecords(serverId: number, start: number, end: number): Promise<TrafficRecord[]> {
-    // TODO: SELECT * FROM traffic_records WHERE server_id = ? AND timestamp BETWEEN ? AND ?
     return [];
   },
   async saveAlert(alert: TrafficAlert): Promise<void> {
-    // TODO: INSERT INTO traffic_alerts (...)
+    console.warn('[Billing] Storage not configured, traffic alert will be lost on restart'),
   },
 };
 

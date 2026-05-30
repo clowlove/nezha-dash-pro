@@ -156,7 +156,7 @@ export abstract class BaseDriver implements IDataSourceDriver {
   /**
    * Helper method to handle fetch errors consistently
    */
-  protected async handleFetchResponse(response: Response): Promise<any> {
+  protected async handleFetchResponse(response: Response): Promise<unknown> {
     if (!response.ok) {
       const errorText = await response.text()
       throw new DriverOperationError(this.name, "fetch", `HTTP ${response.status}: ${errorText}`)

@@ -1,6 +1,8 @@
 // NezhaDash Pro — SaaS Types
 
-export type PlanTier = 'free' | 'pro' | 'team' | 'enterprise';
+import type { PlanTier } from '../shared/types';
+
+export type { PlanTier };
 
 export type SubscriptionStatus = 'trialing' | 'active' | 'past_due' | 'cancelled' | 'expired';
 

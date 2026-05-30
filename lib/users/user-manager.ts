@@ -4,15 +4,152 @@ import {
   Team, CreateTeamInput,
   Invitation, InviteInput, Role,
 } from './types';
+import { getDb, runMigrations } from '../shared/database';
 
-// ── In-memory stores (replace with DB queries in production) ──────────────
+// ── In-memory L1 caches (backed by SQLite) ─────────────────────────────
 const users: Map<string, User> = new Map();
 const teams: Map<string, Team> = new Map();
 const invitations: Map<string, Invitation> = new Map();
 let idCounter = 0;
+let _dbInitialised = false;
 
 function nextId(): string {
   return `id_${++idCounter}_${Date.now()}`;
+}
+
+// ── Database initialisation ────────────────────────────────────────────
+export function initDatabase(): void {
+  if (_dbInitialised) return;
+  runMigrations();
+  loadFromDb();
+  _dbInitialised = true;
+}
+
+function loadFromDb(): void {
+  const db = getDb();
+
+  // Load users
+  const userRows = db.prepare('SELECT * FROM users').all() as Array<Record<string, unknown>>;
+  for (const row of userRows) {
+    const user = rowToUser(row);
+    users.set(user.id, user);
+  }
+
+  // Load teams
+  const teamRows = db.prepare('SELECT * FROM teams').all() as Array<Record<string, unknown>>;
+  for (const row of teamRows) {
+    const team = rowToTeam(row);
+    teams.set(team.id, team);
+  }
+
+  // Load invitations
+  const invRows = db.prepare('SELECT * FROM invitations').all() as Array<Record<string, unknown>;
+  for (const row of invRows) {
+    const inv = rowToInvitation(row);
+    invitations.set(inv.id, inv);
+  }
+}
+
+function rowToUser(row: Record<string, unknown>): User {
+  return {
+    id: row.id as string,
+    email: row.email as string,
+    name: row.name as string,
+    passwordHash: row.password_hash as string,
+    passwordSalt: row.password_salt as string,
+    role: row.role as Role,
+    tenantId: row.tenant_id as string,
+    avatarUrl: row.avatar_url as string | undefined,
+    isActive: Boolean(row.is_active),
+    lastLoginAt: row.last_login_at as string | undefined,
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+  };
+}
+
+function rowToTeam(row: Record<string, unknown>): Team {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    description: row.description as string | undefined,
+    tenantId: row.tenant_id as string,
+    memberIds: JSON.parse(row.member_ids as string),
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+  };
+}
+
+function rowToInvitation(row: Record<string, unknown>): Invitation {
+  return {
+    id: row.id as string,
+    email: row.email as string,
+    role: row.role as Role,
+    teamId: row.team_id as string | undefined,
+    tenantId: row.tenant_id as string,
+    invitedBy: row.invited_by as string,
+    token: row.token as string,
+    expiresAt: row.expires_at as string,
+    acceptedAt: row.accepted_at as string | undefined,
+    createdAt: row.created_at as string,
+  };
+}
+
+// ── Async write-through helpers (fire-and-forget) ──────────────────────
+function persistUser(user: User): void {
+  try {
+    const db = getDb();
+    db.prepare(
+      `INSERT OR REPLACE INTO users
+       (id, email, name, password_hash, password_salt, role, tenant_id, avatar_url, is_active, last_login_at, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(
+      user.id, user.email, user.name, user.passwordHash, user.passwordSalt,
+      user.role, user.tenantId, user.avatarUrl ?? null, user.isActive ? 1 : 0,
+      user.lastLoginAt ?? null, user.createdAt, user.updatedAt,
+    );
+  } catch (err) {
+    console.error('[user-manager] Failed to persist user:', err);
+  }
+}
+
+function persistTeam(team: Team): void {
+  try {
+    const db = getDb();
+    db.prepare(
+      `INSERT OR REPLACE INTO teams
+       (id, name, description, tenant_id, member_ids, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    ).run(
+      team.id, team.name, team.description ?? null, team.tenantId,
+      JSON.stringify(team.memberIds), team.createdAt, team.updatedAt,
+    );
+  } catch (err) {
+    console.error('[user-manager] Failed to persist team:', err);
+  }
+}
+
+function persistInvitation(inv: Invitation): void {
+  try {
+    const db = getDb();
+    db.prepare(
+      `INSERT OR REPLACE INTO invitations
+       (id, email, role, team_id, tenant_id, invited_by, token, expires_at, accepted_at, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(
+      inv.id, inv.email, inv.role, inv.teamId ?? null, inv.tenantId,
+      inv.invitedBy, inv.token, inv.expiresAt, inv.acceptedAt ?? null, inv.createdAt,
+    );
+  } catch (err) {
+    console.error('[user-manager] Failed to persist invitation:', err);
+  }
+}
+
+function deleteFromDb(table: string, id: string): void {
+  try {
+    getDb().prepare(`DELETE FROM ${table} WHERE id = ?`).run(id);
+  } catch (err) {
+    console.error(`[user-manager] Failed to delete ${table}:`, err);
+  }
 }
 
 // ── Password helpers ──────────────────────────────────────────────────────
@@ -56,6 +193,7 @@ export function createUser(input: CreateUserInput): User {
     updatedAt: now,
   };
   users.set(user.id, user);
+  persistUser(user);
   return user;
 }
 
@@ -80,11 +218,14 @@ export function updateUser(id: string, input: UpdateUserInput): User {
   if (input.avatarUrl !== undefined) user.avatarUrl = input.avatarUrl;
   user.updatedAt = new Date().toISOString();
   users.set(id, user);
+  persistUser(user);
   return user;
 }
 
 export function deleteUser(id: string): boolean {
-  return users.delete(id);
+  const deleted = users.delete(id);
+  if (deleted) deleteFromDb('users', id);
+  return deleted;
 }
 
 export function authenticateUser(email: string, password: string, tenantId: string): User | null {
@@ -94,6 +235,7 @@ export function authenticateUser(email: string, password: string, tenantId: stri
   if (!user) return null;
   if (!verifyPassword(password, user.passwordHash, user.passwordSalt)) return null;
   user.lastLoginAt = new Date().toISOString();
+  persistUser(user);
   return user;
 }
 
@@ -107,6 +249,7 @@ export function changePassword(id: string, oldPassword: string, newPassword: str
   user.passwordHash = hash;
   user.passwordSalt = salt;
   user.updatedAt = new Date().toISOString();
+  persistUser(user);
   return true;
 }
 
@@ -123,6 +266,7 @@ export function createTeam(input: CreateTeamInput): Team {
     updatedAt: now,
   };
   teams.set(team.id, team);
+  persistTeam(team);
   return team;
 }
 
@@ -140,6 +284,7 @@ export function addTeamMember(teamId: string, userId: string): Team {
   if (!team.memberIds.includes(userId)) {
     team.memberIds.push(userId);
     team.updatedAt = new Date().toISOString();
+    persistTeam(team);
   }
   return team;
 }
@@ -149,11 +294,14 @@ export function removeTeamMember(teamId: string, userId: string): Team {
   if (!team) throw new Error('Team not found');
   team.memberIds = team.memberIds.filter((id) => id !== userId);
   team.updatedAt = new Date().toISOString();
+  persistTeam(team);
   return team;
 }
 
 export function deleteTeam(id: string): boolean {
-  return teams.delete(id);
+  const deleted = teams.delete(id);
+  if (deleted) deleteFromDb('teams', id);
+  return deleted;
 }
 
 // ── Invitation system ─────────────────────────────────────────────────────
@@ -182,6 +330,7 @@ export function createInvitation(input: InviteInput, invitedBy: string): Invitat
     createdAt: now.toISOString(),
   };
   invitations.set(invitation.id, invitation);
+  persistInvitation(invitation);
   return invitation;
 }
 
@@ -199,6 +348,7 @@ export function acceptInvitation(token: string, userId: string): Invitation {
   if (invitation.teamId) {
     addTeamMember(invitation.teamId, userId);
   }
+  persistInvitation(invitation);
   return invitation;
 }
 
@@ -207,7 +357,9 @@ export function getInvitationsByTenant(tenantId: string): Invitation[] {
 }
 
 export function deleteInvitation(id: string): boolean {
-  return invitations.delete(id);
+  const deleted = invitations.delete(id);
+  if (deleted) deleteFromDb('invitations', id);
+  return deleted;
 }
 
 export function generateInviteLink(invitation: Invitation, baseUrl: string): string {

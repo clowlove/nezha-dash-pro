@@ -1,4 +1,6 @@
-export type PlanTier = 'free' | 'pro' | 'enterprise';
+import type { PlanTier } from '../shared/types';
+
+export type { PlanTier };
 
 export interface TenantQuota {
   maxServers: number;
@@ -63,6 +65,13 @@ export const PLAN_QUOTAS: Record<PlanTier, TenantQuota> = {
     maxAlerts: 100,
     maxTeams: 10,
     maxApiRequestsPerMinute: 600,
+  },
+  team: {
+    maxServers: 200,
+    maxUsers: 100,
+    maxAlerts: 500,
+    maxTeams: 50,
+    maxApiRequestsPerMinute: 3000,
   },
   enterprise: {
     maxServers: -1, // unlimited

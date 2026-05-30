@@ -4,6 +4,10 @@
  * Core engine that evaluates alert rules against server data,
  * manages the alert lifecycle (active → resolved/acknowledged),
  * and dispatches notifications.
+ *
+ * Persistence: active alerts live in memory for fast access; all alerts
+ * are written through to SQLite for durability.  On startup, unresolved
+ * alerts are loaded from SQLite into the in-memory store.
  */
 
 import { randomUUID } from "crypto"
@@ -16,18 +20,95 @@ import type {
 import type { NezhaAPI, ServerApi } from "../drivers/types"
 import { getEnabledRules, evaluateRule } from "./rules"
 import { requestAIDiagnosis } from "./ai-diagnosis"
+import { getDb, runMigrations } from "../shared/database"
 
 // ---------------------------------------------------------------------------
-// In-memory alert store (swap for DB in production)
+// In-memory alert store (backed by SQLite)
 // ---------------------------------------------------------------------------
 
 const alertsStore: Map<string, Alert> = new Map()
+// Index for O(1) lookup of active alerts by ruleId:serverId
+const activeAlertIndex: Map<string, Alert> = new Map()
+
+function activeAlertKey(ruleId: string, serverId: number): string {
+  return `${ruleId}:${serverId}`
+}
 
 /** Track last-triggered timestamps per rule+server to enforce cooldowns */
 const lastTriggeredMap: Map<string, number> = new Map()
 
 /** Track how long a condition has been continuously true (rule+server → seconds) */
 const conditionStartMap: Map<string, number> = new Map()
+
+let _dbInitialised = false
+
+// ---------------------------------------------------------------------------
+// Database initialisation
+// ---------------------------------------------------------------------------
+
+export function initAlertDatabase(): void {
+  if (_dbInitialised) return
+  runMigrations()
+  loadActiveAlerts()
+  _dbInitialised = true
+}
+
+function loadActiveAlerts(): void {
+  const db = getDb()
+  const rows = db.prepare(
+    `SELECT * FROM alerts WHERE status = 'active' OR status = 'acknowledged'`
+  ).all() as Array<Record<string, unknown>>
+
+  for (const row of rows) {
+    const alert = rowToAlert(row)
+    alertsStore.set(alert.id, alert)
+  }
+}
+
+function rowToAlert(row: Record<string, unknown>): Alert {
+  return {
+    id: row.id as string,
+    ruleId: row.rule_id as string,
+    ruleName: row.rule_name as string,
+    serverId: row.server_id as number,
+    serverName: row.server_name as string,
+    metricValue: row.metric_value as number,
+    threshold: row.threshold as number,
+    operator: row.operator as Alert["operator"],
+    severity: row.severity as Alert["severity"],
+    status: row.status as AlertStatus,
+    message: row.message as string,
+    aiDiagnosis: row.ai_diagnosis as string | undefined,
+    triggeredAt: row.triggered_at as string,
+    resolvedAt: row.resolved_at as string | undefined,
+    acknowledgedAt: row.acknowledged_at as string | undefined,
+    acknowledgedBy: row.acknowledged_by as string | undefined,
+    notificationStatus: row.notification_status
+      ? JSON.parse(row.notification_status as string)
+      : {},
+  }
+}
+
+function persistAlert(alert: Alert): void {
+  try {
+    const db = getDb()
+    db.prepare(
+      `INSERT OR REPLACE INTO alerts
+       (id, rule_id, rule_name, server_id, server_name, metric_value, threshold,
+        operator, severity, status, message, ai_diagnosis, triggered_at,
+        resolved_at, acknowledged_at, acknowledged_by, notification_status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(
+      alert.id, alert.ruleId, alert.ruleName, alert.serverId, alert.serverName,
+      alert.metricValue, alert.threshold, alert.operator, alert.severity,
+      alert.status, alert.message, alert.aiDiagnosis ?? null,
+      alert.triggeredAt, alert.resolvedAt ?? null, alert.acknowledgedAt ?? null,
+      alert.acknowledgedBy ?? null, JSON.stringify(alert.notificationStatus ?? {}),
+    )
+  } catch (err) {
+    console.error("[alert-manager] Failed to persist alert:", err)
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -131,9 +212,7 @@ export function evaluateAllRules(serverData: ServerApi): Alert[] {
         if (now - lastTriggered < cooldownMs) continue
 
         // Check if there's already an active alert for this rule+server
-        const existingActive = Array.from(alertsStore.values()).find(
-          (a) => a.ruleId === rule.id && a.serverId === server.id && a.status === "active",
-        )
+        const existingActive = activeAlertIndex.get(activeAlertKey(rule.id, server.id))
         if (existingActive) continue
 
         // Trigger new alert
@@ -154,7 +233,9 @@ export function evaluateAllRules(serverData: ServerApi): Alert[] {
         }
 
         alertsStore.set(alert.id, alert)
+        activeAlertIndex.set(activeAlertKey(rule.id, server.id), alert)
         lastTriggeredMap.set(key, now)
+        persistAlert(alert) // write-through to SQLite
         newlyTriggered.push(alert)
 
         // Fire-and-forget AI diagnosis
@@ -173,6 +254,7 @@ export function evaluateAllRules(serverData: ServerApi): Alert[] {
           const stored = alertsStore.get(alert.id)
           if (stored && diagnosis) {
             stored.aiDiagnosis = `${diagnosis.rootCause}\n\nFix suggestions:\n${diagnosis.suggestions.map((s, i) => `${i + 1}. ${s}`).join("\n")}`
+            persistAlert(stored) // update SQLite with diagnosis
           }
         }).catch((err) => {
           console.error(`AI diagnosis failed for alert ${alert.id}:`, err)
@@ -182,12 +264,12 @@ export function evaluateAllRules(serverData: ServerApi): Alert[] {
         conditionStartMap.delete(key)
 
         // Auto-resolve any active alert for this rule+server
-        const existingActive = Array.from(alertsStore.values()).find(
-          (a) => a.ruleId === rule.id && a.serverId === server.id && a.status === "active",
-        )
+        const existingActive = activeAlertIndex.get(activeAlertKey(rule.id, server.id))
         if (existingActive) {
           existingActive.status = "resolved"
           existingActive.resolvedAt = new Date().toISOString()
+          activeAlertIndex.delete(activeAlertKey(rule.id, server.id))
+          persistAlert(existingActive) // write-through resolution
         }
       }
     }
@@ -211,6 +293,7 @@ export function acknowledgeAlert(alertId: string, acknowledgedBy = "user"): Aler
   alert.status = "acknowledged"
   alert.acknowledgedAt = new Date().toISOString()
   alert.acknowledgedBy = acknowledgedBy
+  persistAlert(alert) // write-through
   return alert
 }
 
@@ -221,6 +304,8 @@ export function resolveAlert(alertId: string): Alert {
   }
   alert.status = "resolved"
   alert.resolvedAt = new Date().toISOString()
+  activeAlertIndex.delete(activeAlertKey(alert.ruleId, alert.serverId))
+  persistAlert(alert) // write-through
   return alert
 }
 
@@ -252,6 +337,7 @@ export function getAlertById(alertId: string): Alert | undefined {
 
 /**
  * Purge resolved/acknowledged alerts older than `maxAgeMs` (default 7 days).
+ * Removes from both memory and SQLite.
  */
 export function purgeStaleAlerts(maxAgeMs = 7 * 24 * 60 * 60 * 1000): number {
   const cutoff = Date.now() - maxAgeMs
@@ -262,5 +348,17 @@ export function purgeStaleAlerts(maxAgeMs = 7 * 24 * 60 * 60 * 1000): number {
       purged++
     }
   }
+
+  // Also purge from SQLite
+  try {
+    const cutoffIso = new Date(cutoff).toISOString()
+    const result = getDb().prepare(
+      `DELETE FROM alerts WHERE status != 'active' AND triggered_at < ?`
+    ).run(cutoffIso)
+    console.log(`[alert-manager] Purged ${result.changes} stale alerts from SQLite`)
+  } catch (err) {
+    console.error("[alert-manager] Failed to purge SQLite alerts:", err)
+  }
+
   return purged
 }

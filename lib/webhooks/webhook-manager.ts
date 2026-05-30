@@ -9,6 +9,7 @@ import type {
   WebhookDeliveryStatus,
   WebhookTestResult,
 } from './types';
+import { getDb, runMigrations } from '../shared/database';
 
 const MAX_RETRY_ATTEMPTS = 3;
 const RETRY_DELAYS = [1000, 5000, 15000]; // Exponential backoff in ms
@@ -72,11 +73,118 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// In-memory store (replace with database in production)
+// In-memory stores (backed by SQLite)
 const webhooks = new Map<string, Webhook>();
 const deliveries = new Map<string, WebhookDelivery>();
+let _dbInitialised = false;
+
+// ── Database helpers ──────────────────────────────────────────────────────
+
+function rowToWebhook(row: Record<string, unknown>): Webhook {
+  return {
+    id: row.id as string,
+    name: row.name as string,
+    url: row.url as string,
+    secret: row.secret as string,
+    events: JSON.parse(row.events as string),
+    active: Boolean(row.active),
+    headers: row.headers ? JSON.parse(row.headers as string) : undefined,
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+    lastTriggeredAt: row.last_triggered_at as string | undefined,
+    failureCount: row.failure_count as number,
+    createdBy: row.created_by as string,
+  };
+}
+
+function rowToDelivery(row: Record<string, unknown>): WebhookDelivery {
+  return {
+    id: row.id as string,
+    webhookId: row.webhook_id as string,
+    eventId: row.event_id as string,
+    status: row.status as WebhookDeliveryStatus,
+    statusCode: row.status_code as number | undefined,
+    responseBody: row.response_body as string | undefined,
+    requestHeaders: JSON.parse(row.request_headers as string),
+    requestBody: row.request_body as string,
+    responseHeaders: row.response_headers ? JSON.parse(row.response_headers as string) : undefined,
+    duration: row.duration as number | undefined,
+    attempt: row.attempt as number,
+    maxAttempts: row.max_attempts as number,
+    nextRetryAt: row.next_retry_at as string | undefined,
+    createdAt: row.created_at as string,
+    completedAt: row.completed_at as string | undefined,
+    error: row.error as string | undefined,
+  };
+}
+
+function persistWebhookToDb(webhook: Webhook): void {
+  try {
+    const db = getDb();
+    db.prepare(
+      `INSERT OR REPLACE INTO webhooks
+       (id, name, url, secret, events, active, headers, created_at, updated_at,
+        last_triggered_at, failure_count, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(
+      webhook.id, webhook.name, webhook.url, webhook.secret,
+      JSON.stringify(webhook.events), webhook.active ? 1 : 0,
+      webhook.headers ? JSON.stringify(webhook.headers) : null,
+      webhook.createdAt, webhook.updatedAt,
+      webhook.lastTriggeredAt ?? null, webhook.failureCount, webhook.createdBy,
+    );
+  } catch (err) {
+    console.error('[webhook-manager] Failed to persist webhook:', err);
+  }
+}
+
+function persistDeliveryToDb(delivery: WebhookDelivery): void {
+  try {
+    const db = getDb();
+    db.prepare(
+      `INSERT OR REPLACE INTO webhook_deliveries
+       (id, webhook_id, event_id, status, status_code, response_body,
+        request_headers, request_body, response_headers, duration,
+        attempt, max_attempts, next_retry_at, created_at, completed_at, error)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    ).run(
+      delivery.id, delivery.webhookId, delivery.eventId, delivery.status,
+      delivery.statusCode ?? null, delivery.responseBody ?? null,
+      JSON.stringify(delivery.requestHeaders), delivery.requestBody,
+      delivery.responseHeaders ? JSON.stringify(delivery.responseHeaders) : null,
+      delivery.duration ?? null, delivery.attempt, delivery.maxAttempts,
+      delivery.nextRetryAt ?? null, delivery.createdAt,
+      delivery.completedAt ?? null, delivery.error ?? null,
+    );
+  } catch (err) {
+    console.error('[webhook-manager] Failed to persist delivery:', err);
+  }
+}
 
 export class WebhookManager {
+  // ===== Initialisation =====
+
+  initDatabase(): void {
+    if (_dbInitialised) return;
+    runMigrations();
+    // Load webhooks from SQLite
+    const db = getDb();
+    const webhookRows = db.prepare('SELECT * FROM webhooks').all() as Array<Record<string, unknown>>;
+    for (const row of webhookRows) {
+      const wh = rowToWebhook(row);
+      webhooks.set(wh.id, wh);
+    }
+    // Load recent deliveries (last 1000)
+    const deliveryRows = db.prepare(
+      'SELECT * FROM webhook_deliveries ORDER BY created_at DESC LIMIT 1000'
+    ).all() as Array<Record<string, unknown>>;
+    for (const row of deliveryRows) {
+      const d = rowToDelivery(row);
+      deliveries.set(d.id, d);
+    }
+    _dbInitialised = true;
+  }
+
   // ===== CRUD Operations =====
 
   async create(input: WebhookCreateInput, userId: string): Promise<Webhook> {
@@ -97,6 +205,7 @@ export class WebhookManager {
     };
 
     webhooks.set(webhook.id, webhook);
+    persistWebhookToDb(webhook);
     return webhook;
   }
 
@@ -133,6 +242,7 @@ export class WebhookManager {
     };
 
     webhooks.set(id, updated);
+    persistWebhookToDb(updated);
     return updated;
   }
 
@@ -140,12 +250,22 @@ export class WebhookManager {
     if (!webhooks.has(id)) return false;
     webhooks.delete(id);
 
-    // Clean up associated deliveries
+    // Clean up associated deliveries from memory
     for (const [key, delivery] of deliveries) {
       if (delivery.webhookId === id) {
         deliveries.delete(key);
       }
     }
+
+    // Clean up from SQLite
+    try {
+      const db = getDb();
+      db.prepare('DELETE FROM webhooks WHERE id = ?').run(id);
+      db.prepare('DELETE FROM webhook_deliveries WHERE webhook_id = ?').run(id);
+    } catch (err) {
+      console.error('[webhook-manager] Failed to delete from SQLite:', err);
+    }
+
     return true;
   }
 
@@ -157,6 +277,7 @@ export class WebhookManager {
     webhook.secret = newSecret;
     webhook.updatedAt = new Date().toISOString();
     webhooks.set(id, webhook);
+    persistWebhookToDb(webhook);
     return newSecret;
   }
 
@@ -196,6 +317,7 @@ export class WebhookManager {
         webhook.lastTriggeredAt = new Date().toISOString();
         webhook.failureCount = 0;
         webhooks.set(webhook.id, webhook);
+        persistWebhookToDb(webhook);
         return lastDelivery;
       }
     }
@@ -204,6 +326,7 @@ export class WebhookManager {
     if (lastDelivery) {
       webhook.failureCount += 1;
       webhooks.set(webhook.id, webhook);
+      persistWebhookToDb(webhook);
     }
 
     return lastDelivery!;
@@ -282,6 +405,7 @@ export class WebhookManager {
     }
 
     deliveries.set(deliveryId, delivery);
+    persistDeliveryToDb(delivery); // write-through to SQLite
     return delivery;
   }
 
